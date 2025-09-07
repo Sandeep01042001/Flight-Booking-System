@@ -1,7 +1,8 @@
 package com.flightbookingsystem.database_api.model;
 
 
-import com.flightbookingsystem.database_api.enums.EmployeeRole;
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Employee {
     @Id
-    private String employeeId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID employeeId;
 
     private String name;
     private String email;

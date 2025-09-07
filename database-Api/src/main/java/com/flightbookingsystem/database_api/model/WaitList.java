@@ -1,7 +1,11 @@
 package com.flightbookingsystem.database_api.model;
 
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -15,7 +19,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class WaitList {
     @Id
-    private String waitlistId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID waitlistId;
 
     private Integer position;
     private String status;

@@ -3,6 +3,7 @@ package com.flightbookingsystem.database_api.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Entity
 public class Airport {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID airportId;
 
     private String airportCode;  // e.g., "DEL"

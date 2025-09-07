@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/seat")
+@RequestMapping("/api/v1/db/seat")
 public class SeatController {
 
      SeatRepository seatRepository;
@@ -40,8 +40,8 @@ public class SeatController {
 
     // Get seat by ID
     @GetMapping("/{seatId}")
-    public ResponseEntity<Seat> getSeatById(@PathVariable String seatId) {
-        Seat seat = seatRepository.findById(seatId).orElse(null);
+    public ResponseEntity<Seat> getSeatById(@PathVariable UUID seatId) {
+        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -50,10 +50,10 @@ public class SeatController {
 
     // Create new seat
     @PostMapping("/create/{flightId}/{fareId}")
-    public ResponseEntity<Seat> createSeat(@PathVariable String flightId,
+    public ResponseEntity<Seat> createSeat(@PathVariable UUID flightId,
                                            @PathVariable UUID fareId,
                                            @RequestBody Seat seat) {
-        Flight flight = flightRepository.findById(flightId).orElse(null);
+        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
         Fare fare = fareRepository.findById(fareId).orElse(null);
 
         if (flight == null || fare == null) {
@@ -69,9 +69,9 @@ public class SeatController {
 
     // Update seat
     @PutMapping("/{seatId}")
-    public ResponseEntity<Seat> updateSeat(@PathVariable String seatId,
+    public ResponseEntity<Seat> updateSeat(@PathVariable UUID seatId,
                                            @RequestBody Seat updatedSeat) {
-        Seat seat = seatRepository.findById(seatId).orElse(null);
+        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -95,8 +95,8 @@ public class SeatController {
 
     // Delete seat
     @DeleteMapping("/{seatId}")
-    public ResponseEntity<Void> deleteSeat(@PathVariable String seatId) {
-        Seat seat = seatRepository.findById(seatId).orElse(null);
+    public ResponseEntity<Void> deleteSeat(@PathVariable UUID seatId) {
+        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

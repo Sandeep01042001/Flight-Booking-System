@@ -1,4 +1,4 @@
-package com.flightbookingsystem.database_api.enums;
+package com.flightbookingsystem.database_api.model;
 
 public enum Role {
     Customer,

@@ -1,7 +1,8 @@
 package com.flightbookingsystem.database_api.model;
 
 
-import com.flightbookingsystem.database_api.enums.PaymentStatus;
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Payment {
     @Id
-    private String paymentId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID paymentId;
 
     private Double amount;
     private String method;

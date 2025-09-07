@@ -1,15 +1,32 @@
 package com.FBS.auth_Api.security;
 
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.FBS.auth_Api.models.Customer;
+import com.FBS.auth_Api.enums.Role;
+import com.FBS.auth_Api.service.CustomerService;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
 @Component
 public class AuthUtility {
-    @Value("${toten.expirationTime}")
+    @Value("${token.expirationTime}")
     Long expirationTime;
 
     @Value("${security.secretPassword}")
     String secretPassword;
+
+    CustomerService customerService;
+    
+    @Autowired
+    public AuthUtility(CustomerService customerService) {
+        this.customerService = customerService;
+    }
 
     public String generateToken(String email,
                                 String password,
@@ -41,22 +58,19 @@ public class AuthUtility {
      * @param token
      */
     public boolean validateToken(String token){
-        
-        return true;
-
-        /*String payload =this.decryptJwtToken(token);
+        String payload =this.decryptJwtToken(token);
         String[] data = payload.split(":");
         String email = data[0];
         String password = data[1];
         String role = data[2];
         // I need to get the user having this email and password. 
-        Employee employee = userService.getUserDetails(email);
-        if(employee == null){
+        Customer customer = customerService.getCustomerDetails(email);
+        if(customer == null){
             return false;
         }
-        if(!employee.getPassword().equals(password)){
+        if(!customer.getPassword().equals(password)){
             return false;
         }
-         return true; */
+         return true;
     }
 }

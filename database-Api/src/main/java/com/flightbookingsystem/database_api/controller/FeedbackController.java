@@ -18,7 +18,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/api/v1/feedback")
+@RequestMapping("/api/v1/db/feedback")
 public class FeedbackController {
 
      FeedBackRepository feedBackRepository;
@@ -42,8 +42,8 @@ public class FeedbackController {
 
     // Get feedback by ID
     @GetMapping("/{feedbackId}")
-    public ResponseEntity<FeedBack> getFeedbackById(@PathVariable String feedbackId) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
+    public ResponseEntity<FeedBack> getFeedbackById(@PathVariable UUID feedbackId) {
+        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -53,10 +53,10 @@ public class FeedbackController {
     // Create new feedback
     @PostMapping("/create/{customerId}/{flightId}")
     public ResponseEntity<FeedBack> createFeedback(@PathVariable UUID customerId,
-                                                   @PathVariable String flightId,
+                                                   @PathVariable UUID flightId,
                                                    @RequestBody FeedBack feedback) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        Flight flight = flightRepository.findById(flightId).orElse(null);
+        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
 
         if (customer == null || flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,9 +72,9 @@ public class FeedbackController {
 
     // Update feedback
     @PutMapping("/{feedbackId}")
-    public ResponseEntity<FeedBack> updateFeedback(@PathVariable String feedbackId,
+    public ResponseEntity<FeedBack> updateFeedback(@PathVariable UUID feedbackId,
                                                    @RequestBody FeedBack updatedFeedback) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
+        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -95,8 +95,8 @@ public class FeedbackController {
 
     // Delete feedback
     @DeleteMapping("/{feedbackId}")
-    public ResponseEntity<Void> deleteFeedback(@PathVariable String feedbackId) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
+    public ResponseEntity<Void> deleteFeedback(@PathVariable UUID feedbackId) {
+        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

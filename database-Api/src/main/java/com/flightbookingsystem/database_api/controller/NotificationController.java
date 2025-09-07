@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/notification")
+@RequestMapping("/api/v1/db/notification")
 public class NotificationController {
 
     NotificationRepository notificationRepository;
@@ -62,9 +62,9 @@ public class NotificationController {
 
     // Update notification
     @PutMapping("/{notificationId}")
-    public ResponseEntity<Notification> updateNotification(@PathVariable String notificationId,
+    public ResponseEntity<Notification> updateNotification(@PathVariable UUID notificationId,
                                                            @RequestBody Notification updatedNotification) {
-        Notification notification = notificationRepository.findById(notificationId).orElse(null);
+        Notification notification = notificationRepository.findById(notificationId.toString()).orElse(null);
         if (notification == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -79,8 +79,8 @@ public class NotificationController {
 
     // Delete notification
     @DeleteMapping("/{notificationId}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable String notificationId) {
-        Notification notification = notificationRepository.findById(notificationId).orElse(null);
+    public ResponseEntity<Void> deleteNotification(@PathVariable UUID notificationId) {
+        Notification notification = notificationRepository.findById(notificationId.toString()).orElse(null);
         if (notification == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

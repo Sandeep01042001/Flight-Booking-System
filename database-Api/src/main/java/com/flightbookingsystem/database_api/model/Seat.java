@@ -1,8 +1,8 @@
 package com.flightbookingsystem.database_api.model;
 
 
-import com.flightbookingsystem.database_api.enums.SeatClass;
-import com.flightbookingsystem.database_api.enums.SeatStatus;
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Seat {
     @Id
-    private String seatId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID seatId;
 
     private String seatNumber;
 

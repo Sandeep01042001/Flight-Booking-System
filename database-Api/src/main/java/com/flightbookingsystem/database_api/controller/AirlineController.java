@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/airline")
+@RequestMapping("/api/v1/db/airline")
 public class AirlineController {
 
      AirlineRepository airlineRepository;
@@ -28,8 +28,8 @@ public class AirlineController {
     }
   //get all airline by id
     @GetMapping("/{airlineId}")
-    public ResponseEntity<Airline> getAirlineById(@PathVariable String airlineId) {
-        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+    public ResponseEntity<Airline> getAirlineById(@PathVariable UUID airlineId) {
+        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -40,8 +40,8 @@ public class AirlineController {
         return airlineRepository.save(airline);
     }
     @PutMapping("/{airlineId}")
-    public ResponseEntity<Airline> updateAirline(@PathVariable String airlineId, @RequestBody Airline updatedAirline) {
-        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+    public ResponseEntity<Airline> updateAirline(@PathVariable UUID airlineId, @RequestBody Airline updatedAirline) {
+        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -59,8 +59,8 @@ public class AirlineController {
 
     // Delete airline
     @DeleteMapping("/{airlineId}")
-    public ResponseEntity<Void> deleteAirline(@PathVariable String airlineId) {
-        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+    public ResponseEntity<Void> deleteAirline(@PathVariable UUID airlineId) {
+        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

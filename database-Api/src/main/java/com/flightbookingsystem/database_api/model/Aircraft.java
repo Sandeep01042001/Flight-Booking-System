@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +15,8 @@ import java.util.List;
 @Entity
 public class Aircraft {
     @Id
-    private String aircraftId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID aircraftId;
 
     private String aircraftNumber;
     private String type;

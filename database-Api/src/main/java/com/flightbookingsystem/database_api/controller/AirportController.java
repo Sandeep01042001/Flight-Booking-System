@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/airport")
+@RequestMapping("/api/v1/db/airport")
 public class AirportController {
 
     AirportRepository airportRepository;

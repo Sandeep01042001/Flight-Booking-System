@@ -23,7 +23,8 @@ import java.util.UUID;
 @Entity
 public class Flight {
     @Id
-    private String flightId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID flightId;
 
     @ManyToOne
     @JoinColumn(name = "origin_airport_id")

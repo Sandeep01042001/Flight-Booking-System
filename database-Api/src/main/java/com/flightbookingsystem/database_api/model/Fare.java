@@ -1,7 +1,6 @@
 package com.flightbookingsystem.database_api.model;
 
 
-import com.flightbookingsystem.database_api.enums.SeatClass;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Entity
 public class Fare {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID fareId;
 
     @Enumerated(EnumType.STRING)

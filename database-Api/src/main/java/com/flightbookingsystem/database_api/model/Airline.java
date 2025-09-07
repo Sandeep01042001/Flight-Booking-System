@@ -1,13 +1,13 @@
 package com.flightbookingsystem.database_api.model;
 
 
-import com.flightbookingsystem.database_api.enums.CompanySize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,8 @@ import java.util.List;
 public class Airline {
 
     @Id
-    private String airlineId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID airlineId;
 
     private String name;
     private String officialName;

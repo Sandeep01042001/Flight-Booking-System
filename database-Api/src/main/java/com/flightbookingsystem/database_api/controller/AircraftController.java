@@ -11,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/aircraft")
+@RequestMapping("/api/v1/db/aircraft")
 public class AircraftController {
 
       AircraftRepository aircraftRepository;
@@ -31,8 +32,8 @@ public class AircraftController {
     }
 
     @GetMapping("/{aircraftId}")
-    public ResponseEntity<Aircraft> getAircraftById(@PathVariable String aircraftId) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
+    public ResponseEntity<Aircraft> getAircraftById(@PathVariable UUID aircraftId) {
+        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -40,8 +41,8 @@ public class AircraftController {
     }
 
     @PostMapping("/create/{airlineId}")
-    public ResponseEntity<Aircraft> createAircraft(@PathVariable String airlineId, @RequestBody Aircraft aircraft) {
-        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+    public ResponseEntity<Aircraft> createAircraft(@PathVariable UUID airlineId, @RequestBody Aircraft aircraft) {
+        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -52,8 +53,8 @@ public class AircraftController {
     }
 
     @PutMapping("/{aircraftId}")
-    public ResponseEntity<Aircraft> updateAircraft(@PathVariable String aircraftId, @RequestBody Aircraft updatedAircraft) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
+    public ResponseEntity<Aircraft> updateAircraft(@PathVariable UUID aircraftId, @RequestBody Aircraft updatedAircraft) {
+        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -74,8 +75,8 @@ public class AircraftController {
 
     // Get all flights of an aircraft
     @GetMapping("/{aircraftId}/flights")
-    public ResponseEntity<List> getFlightsOfAircraft(@PathVariable String aircraftId) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
+    public ResponseEntity<List> getFlightsOfAircraft(@PathVariable UUID aircraftId) {
+        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

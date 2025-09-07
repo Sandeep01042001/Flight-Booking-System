@@ -11,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/employee")
+@RequestMapping("/api/v1/db/employee")
 public class EmployeeController {
 
 
@@ -26,6 +27,8 @@ public class EmployeeController {
         this.airlineRepository = airlineRepository;
     }
 
+   
+
     // Get all employees
     @GetMapping
     public List<Employee> getAllEmployees() {
@@ -34,8 +37,8 @@ public class EmployeeController {
 
     // Get employee by ID
     @GetMapping("/{employeeId}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable String employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -44,8 +47,8 @@ public class EmployeeController {
 
     // Create a new employee
     @PostMapping("/create/{airlineId}")
-    public ResponseEntity<Employee> createEmployee(@PathVariable String airlineId, @RequestBody Employee employee) {
-        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+    public ResponseEntity<Employee> createEmployee(@PathVariable UUID airlineId, @RequestBody Employee employee) {
+        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -57,8 +60,8 @@ public class EmployeeController {
 
     // Update employee
     @PutMapping("/{employeeId}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable String employeeId, @RequestBody Employee updatedEmployee) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+    public ResponseEntity<Employee> updateEmployee(@PathVariable UUID employeeId, @RequestBody Employee updatedEmployee) {
+        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -79,8 +82,8 @@ public class EmployeeController {
 
     // Delete employee
     @DeleteMapping("/{employeeId}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable String employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
+    public ResponseEntity<Void> deleteEmployee(@PathVariable UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

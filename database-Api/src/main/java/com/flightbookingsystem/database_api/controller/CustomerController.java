@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/customer")
+@RequestMapping("/api/v1/db/customer")
 public class CustomerController {
 
 
@@ -21,6 +21,13 @@ public class CustomerController {
     @Autowired
     public CustomerController(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
+    }
+
+    @GetMapping("{email}")
+    public ResponseEntity<Customer> getEmployeeByEmailId(@PathVariable String email){
+        Customer customer = customerRepository.findByEmail(email);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+
     }
 
     @PostMapping("/create")

@@ -3,8 +3,19 @@ package com.FBS.auth_Api.models;
 import java.util.List;
 import java.util.UUID;
 
-import javax.management.Notification;
+import com.FBS.auth_Api.enums.Role;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Customer {
     
     private UUID customerId;
@@ -20,7 +31,12 @@ public class Customer {
 
     private Role role;
     private List<Booking> bookings;
-    private List<Notification> notifications;
+    private String notification;
     private List<FeedBack> feedbacks;
     private List<WaitList> waitlists;
+    
+    // Explicit getter for password to ensure it's available
+    public String getPassword() {
+        return this.password;
+    }
 }

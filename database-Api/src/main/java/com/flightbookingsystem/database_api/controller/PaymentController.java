@@ -1,9 +1,9 @@
 package com.flightbookingsystem.database_api.controller;
 
 
-import com.flightbookingsystem.database_api.enums.PaymentStatus;
 import com.flightbookingsystem.database_api.model.Booking;
 import com.flightbookingsystem.database_api.model.Payment;
+import com.flightbookingsystem.database_api.model.PaymentStatus;
 import com.flightbookingsystem.database_api.reposatories.BookingRepository;
 import com.flightbookingsystem.database_api.reposatories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/payment")
+@RequestMapping("/api/v1/db/payment")
 public class PaymentController {
 
      PaymentRepository paymentRepository;
@@ -35,8 +36,8 @@ public class PaymentController {
 
     // Get payment by ID
     @GetMapping("/{paymentId}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable String paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+    public ResponseEntity<Payment> getPaymentById(@PathVariable UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -45,9 +46,9 @@ public class PaymentController {
 
     // Create new payment
     @PostMapping("/create/{bookingId}")
-    public ResponseEntity<Payment> createPayment(@PathVariable String bookingId,
+    public ResponseEntity<Payment> createPayment(@PathVariable UUID bookingId,
                                                  @RequestBody Payment payment) {
-        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        Booking booking = bookingRepository.findById(bookingId.toString()).orElse(null);
         if (booking == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -61,9 +62,9 @@ public class PaymentController {
 
     // Update payment
     @PutMapping("/{paymentId}")
-    public ResponseEntity<Payment> updatePayment(@PathVariable String paymentId,
+    public ResponseEntity<Payment> updatePayment(@PathVariable UUID paymentId,
                                                  @RequestBody Payment updatedPayment) {
-        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -84,8 +85,8 @@ public class PaymentController {
 
     // Delete payment
     @DeleteMapping("/{paymentId}")
-    public ResponseEntity<Void> deletePayment(@PathVariable String paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElse(null);
+    public ResponseEntity<Void> deletePayment(@PathVariable UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

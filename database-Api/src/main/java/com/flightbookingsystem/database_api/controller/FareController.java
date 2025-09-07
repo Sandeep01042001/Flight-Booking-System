@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/fare")
+@RequestMapping("/api/v1/db/fare")
 public class FareController {
 
 

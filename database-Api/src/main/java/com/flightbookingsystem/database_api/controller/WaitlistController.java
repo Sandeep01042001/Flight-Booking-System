@@ -17,7 +17,7 @@ import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/api/v1/waitlist")
+@RequestMapping("/api/v1/db/waitlist")
 public class WaitlistController {
 
 
@@ -42,8 +42,8 @@ public class WaitlistController {
 
     // Get waitlist by ID
     @GetMapping("/{waitlistId}")
-    public ResponseEntity<WaitList> getWaitListById(@PathVariable String waitlistId) {
-        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
+    public ResponseEntity<WaitList> getWaitListById(@PathVariable UUID waitlistId) {
+        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -53,10 +53,10 @@ public class WaitlistController {
     // Create new waitlist entry
     @PostMapping("/create/{customerId}/{flightId}")
     public ResponseEntity<WaitList> createWaitList(@PathVariable UUID customerId,
-                                                   @PathVariable String flightId,
+                                                   @PathVariable UUID flightId,
                                                    @RequestBody WaitList waitList) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        Flight flight = flightRepository.findById(flightId).orElse(null);
+        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
 
         if (customer == null || flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -71,9 +71,9 @@ public class WaitlistController {
 
     // Update waitlist
     @PutMapping("/{waitlistId}")
-    public ResponseEntity<WaitList> updateWaitList(@PathVariable String waitlistId,
+    public ResponseEntity<WaitList> updateWaitList(@PathVariable UUID waitlistId,
                                                    @RequestBody WaitList updatedWaitList) {
-        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
+        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -95,8 +95,8 @@ public class WaitlistController {
 
     // Delete waitlist
     @DeleteMapping("/{waitlistId}")
-    public ResponseEntity<Void> deleteWaitList(@PathVariable String waitlistId) {
-        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
+    public ResponseEntity<Void> deleteWaitList(@PathVariable UUID waitlistId) {
+        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

@@ -1,4 +1,4 @@
-package com.flightbookingsystem.database_api.model;
+package com.FBS.auth_Api.enums;
 
 public enum CompanySize {
     Small,

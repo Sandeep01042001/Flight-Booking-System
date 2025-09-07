@@ -1,6 +1,5 @@
 package com.flightbookingsystem.database_api.model;
 
-import com.flightbookingsystem.database_api.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +13,7 @@ import java.time.ZonedDateTime;
 @Entity
 public class Booking {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String bookingId;
 
     private ZonedDateTime bookingTime;
