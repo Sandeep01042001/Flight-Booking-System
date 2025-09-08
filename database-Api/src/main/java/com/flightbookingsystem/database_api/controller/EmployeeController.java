@@ -3,6 +3,7 @@ package com.flightbookingsystem.database_api.controller;
 
 import com.flightbookingsystem.database_api.model.Airline;
 import com.flightbookingsystem.database_api.model.Employee;
+import com.flightbookingsystem.database_api.model.Role;
 import com.flightbookingsystem.database_api.reposatories.AirlineRepository;
 import com.flightbookingsystem.database_api.reposatories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,14 @@ public class EmployeeController {
         }
         return new ResponseEntity<>(employee, HttpStatus.OK);
     }
+     // create a new employee with Admin role
+     @PostMapping("/create/admin")
+     public ResponseEntity<Employee> createEmployeeWithRole(@RequestBody Employee employee) {
+        return new ResponseEntity<>(employeeRepository.save(employee), HttpStatus.CREATED);
+     }
 
-    // Create a new employee
+
+    // Create a new employee with airline id
     @PostMapping("/create/{airlineId}")
     public ResponseEntity<Employee> createEmployee(@PathVariable UUID airlineId, @RequestBody Employee employee) {
         Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);

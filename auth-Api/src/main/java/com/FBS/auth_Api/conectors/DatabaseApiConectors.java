@@ -28,7 +28,7 @@ public class DatabaseApiConectors {
      */
     public Customer callGetCustomerByEmailEndPoint(String email){
         // 1. create url
-        String url = databaseApiUrl + "/customer/" + email; 
+        String url = databaseApiUrl + "/customer/email/" + email; 
         // 2. create RequestEntity
         RequestEntity request = RequestEntity.get(url).build();
         // 3. call the database api 

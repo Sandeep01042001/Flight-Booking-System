@@ -37,18 +37,10 @@ public class AuthControler {
        return token;
    }
 
-    @GetMapping("/validate/{oprName}")
-    public Customer validateToken(@RequestHeader String Authorization,
-                                @PathVariable String oprName){
+    @GetMapping("/validate")
+    public String validateToken(@RequestHeader String Authorization){
         String token = Authorization.substring(7);
-        // Authentication check
-        if(!authUtility.validateToken(token)){
-            return null;
-        }
-        String email  = authUtility.decryptJwtToken(token).split(":")[0];
-        // Authorization check
-        Customer customer = customerService.isHavingAccess(email, oprName);
-        return customer;
-    }
+        return authUtility.validateToken(token) ? "Valid Token" : "Invalied Token"; 
+      }
 
 }

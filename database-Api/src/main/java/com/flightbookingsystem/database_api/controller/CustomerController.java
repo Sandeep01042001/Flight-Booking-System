@@ -23,8 +23,8 @@ public class CustomerController {
         this.customerRepository = customerRepository;
     }
 
-    @GetMapping("{email}")
-    public ResponseEntity<Customer> getEmployeeByEmailId(@PathVariable String email){
+    @GetMapping("/email/{email}")
+    public ResponseEntity getCustomerByEmailId(@PathVariable String email){
         Customer customer = customerRepository.findByEmail(email);
         return new ResponseEntity<>(customer, HttpStatus.OK);
 

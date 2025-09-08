@@ -71,6 +71,6 @@ public class AuthUtility {
         if(!customer.getPassword().equals(password)){
             return false;
         }
-         return true;
+        return true;
     }
 }

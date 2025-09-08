@@ -26,6 +26,9 @@ public class CustomerService {
     public Customer isHavingAccess(String email,
                                    String oprName){
         Customer customer = this.getCustomerDetails(email);
+        if(customer == null){
+            return null;
+        }
         Role role = customer.getRole();
         if(role == Role.Admin){
             return customer;
