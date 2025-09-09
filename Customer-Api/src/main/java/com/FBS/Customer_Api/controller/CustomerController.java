@@ -15,7 +15,7 @@ public class CustomerController {
     private CustomerService service;
     private AuthApiConnector authConnector;
 
-    public CustomerController(CustomerService service, com.FBS.Customer_Api.connector.AuthApiConnector authConnector) {
+    public CustomerController(CustomerService service, AuthApiConnector authConnector) {
         this.service = service;
         this.authConnector = authConnector;
     }
@@ -24,6 +24,7 @@ public class CustomerController {
 
     @PostMapping("/register")
     public Customer register(@RequestBody Customer customer) {
+
         return service.registerCustomer(customer);
     }
 
@@ -34,11 +35,13 @@ public class CustomerController {
 
     @GetMapping("/getById/{id}")
     public Customer getById(@PathVariable UUID id) {
+
         return service.getCustomerById(id);
     }
 
     @GetMapping("/email/{email}")
     public Customer getByEmail(@PathVariable String email) {
+
         return service.getCustomerByEmail(email);
     }
 

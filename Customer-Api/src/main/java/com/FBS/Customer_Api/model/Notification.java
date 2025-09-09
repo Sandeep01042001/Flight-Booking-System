@@ -1,31 +1,21 @@
 package com.FBS.Customer_Api.model;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@NoArgsConstructor
 public class Notification {
-    @Id
-    private String notificationId;
-
+    private UUID notificationId;
     private String type;
     private String message;
     private ZonedDateTime sentAt;
     private String status;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
     private Customer customer;
-
 }

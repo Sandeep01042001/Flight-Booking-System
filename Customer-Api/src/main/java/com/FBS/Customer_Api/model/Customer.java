@@ -1,20 +1,22 @@
 package com.FBS.Customer_Api.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.UUID;
 
+import com.FBS.Customer_Api.enums.Role;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class Customer {
-    @Id
-    @GeneratedValue
+    
     private UUID customerId;
 
     private String name;
@@ -26,21 +28,14 @@ public class Customer {
     private Double walletBalance;
     private Integer loyaltyPoints;
 
-    @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Booking> bookings;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Notification> notifications;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private String notification;
     private List<FeedBack> feedbacks;
-
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<WaitList> waitlists;
-
-
-
+    
+    // Explicit getter for password to ensure it's available
+    public String getPassword() {
+        return this.password;
+    }
 }

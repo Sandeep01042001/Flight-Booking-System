@@ -14,7 +14,7 @@ import java.util.UUID;
 public class DatabaseApiConnector {
 
     @Value("${database.api.url}")
-    private String databaseApiUrl; // e.g. http://localhost:8081/api/v1/database
+    private String databaseApiUrl; // e.g. http://localhost:8080/api/v1/database
 
     private final RestTemplate restTemplate = new RestTemplate();
 

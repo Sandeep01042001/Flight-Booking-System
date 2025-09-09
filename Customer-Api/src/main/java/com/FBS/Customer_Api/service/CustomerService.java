@@ -29,24 +29,39 @@ public class CustomerService {
     }
 
     // READ
-    public List<Customer> getAllCustomers() { return dbConnector.getAllCustomers(); }
-    public Customer getCustomerById(UUID id) { return dbConnector.getCustomerById(id); }
-    public Customer getCustomerByEmail(String email) { return dbConnector.getCustomerByEmail(email); }
+    public List<Customer> getAllCustomers() {
+        return dbConnector.getAllCustomers();
+    }
+
+    public Customer getCustomerById(UUID id) {
+        return dbConnector.getCustomerById(id);
+    }
+
+    public Customer getCustomerByEmail(String email) {
+        return dbConnector.getCustomerByEmail(email);
+    }
 
     // UPDATE
     public Customer updateCustomer(UUID id, Customer customer) {
+
         return dbConnector.updateCustomer(id, customer);
     }
 
     // DELETE
-    public void deleteCustomer(UUID id) { dbConnector.deleteCustomer(id); }
+    public void deleteCustomer(UUID id) {
+        dbConnector.deleteCustomer(id);
+    }
 
     // AUTH
     public AuthApiConnector.TokenResponse login(String email, String password) {
         return authConnector.login(email, password);
     }
 
-    public boolean validateToken(String token) { return authConnector.validateToken(token); }
+    public boolean validateToken(String token) {
+        return authConnector.validateToken(token);
+    }
 
-    public String logout(String token) { return authConnector.logout(token); }
+    public String logout(String token) {
+        return authConnector.logout(token);
+    }
 }
