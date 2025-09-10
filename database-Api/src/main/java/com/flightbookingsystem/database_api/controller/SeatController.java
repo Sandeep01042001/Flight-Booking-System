@@ -41,7 +41,7 @@ public class SeatController {
     // Get seat by ID
     @GetMapping("/{seatId}")
     public ResponseEntity<Seat> getSeatById(@PathVariable UUID seatId) {
-        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
+        Seat seat = seatRepository.findById(seatId).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -53,7 +53,7 @@ public class SeatController {
     public ResponseEntity<Seat> createSeat(@PathVariable UUID flightId,
                                            @PathVariable UUID fareId,
                                            @RequestBody Seat seat) {
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
         Fare fare = fareRepository.findById(fareId).orElse(null);
 
         if (flight == null || fare == null) {
@@ -71,7 +71,7 @@ public class SeatController {
     @PutMapping("/{seatId}")
     public ResponseEntity<Seat> updateSeat(@PathVariable UUID seatId,
                                            @RequestBody Seat updatedSeat) {
-        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
+        Seat seat = seatRepository.findById(seatId).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -96,7 +96,7 @@ public class SeatController {
     // Delete seat
     @DeleteMapping("/{seatId}")
     public ResponseEntity<Void> deleteSeat(@PathVariable UUID seatId) {
-        Seat seat = seatRepository.findById(seatId.toString()).orElse(null);
+        Seat seat = seatRepository.findById(seatId).orElse(null);
         if (seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

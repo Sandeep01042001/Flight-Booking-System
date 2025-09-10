@@ -17,9 +17,12 @@ public class AirlineDetailsDto {
     private String officialName;
     private String officialEmail;
     private String officialPhone;
+    private String companySize;
     private String adminName;
     private String adminEmail;
     private String adminPhone;
     private String address;
+
+   
     
 }

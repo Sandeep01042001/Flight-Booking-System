@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Aircraft {
-     private UUID aircraftId;
+    private UUID aircraftId;
 
     private String aircraftNumber;
     private String type;

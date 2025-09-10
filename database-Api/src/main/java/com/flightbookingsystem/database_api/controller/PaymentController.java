@@ -37,7 +37,7 @@ public class PaymentController {
     // Get payment by ID
     @GetMapping("/{paymentId}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable UUID paymentId) {
-        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -48,7 +48,7 @@ public class PaymentController {
     @PostMapping("/create/{bookingId}")
     public ResponseEntity<Payment> createPayment(@PathVariable UUID bookingId,
                                                  @RequestBody Payment payment) {
-        Booking booking = bookingRepository.findById(bookingId.toString()).orElse(null);
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
         if (booking == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -64,7 +64,7 @@ public class PaymentController {
     @PutMapping("/{paymentId}")
     public ResponseEntity<Payment> updatePayment(@PathVariable UUID paymentId,
                                                  @RequestBody Payment updatedPayment) {
-        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -86,7 +86,7 @@ public class PaymentController {
     // Delete payment
     @DeleteMapping("/{paymentId}")
     public ResponseEntity<Void> deletePayment(@PathVariable UUID paymentId) {
-        Payment payment = paymentRepository.findById(paymentId.toString()).orElse(null);
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
         if (payment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

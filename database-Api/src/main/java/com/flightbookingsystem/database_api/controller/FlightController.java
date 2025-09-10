@@ -46,7 +46,7 @@ public class FlightController {
     // Get flight by ID
     @GetMapping("/{flightId}")
     public ResponseEntity<Flight> getFlightById(@PathVariable UUID flightId) {
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
         if (flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -62,8 +62,8 @@ public class FlightController {
                                                @RequestBody Flight flight) {
         Airport origin = airportRepository.findById(originId).orElse(null);
         Airport destination = airportRepository.findById(destinationId).orElse(null);
-        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
-        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
+        Airline airline = airlineRepository.findById(airlineId).orElse(null);
+        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
 
         if (origin == null || destination == null || airline == null || aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -82,7 +82,7 @@ public class FlightController {
     @PutMapping("/{flightId}")
     public ResponseEntity<Flight> updateFlight(@PathVariable UUID flightId,
                                                @RequestBody Flight updatedFlight) {
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
         if (flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -113,7 +113,7 @@ public class FlightController {
     // Delete flight
     @DeleteMapping("/{flightId}")
     public ResponseEntity<Void> deleteFlight(@PathVariable UUID flightId) {
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
         if (flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

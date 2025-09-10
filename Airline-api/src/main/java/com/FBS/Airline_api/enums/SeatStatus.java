@@ -6,3 +6,4 @@ public enum SeatStatus {
     BLOCKED,
     RESERVED
 }
+ 

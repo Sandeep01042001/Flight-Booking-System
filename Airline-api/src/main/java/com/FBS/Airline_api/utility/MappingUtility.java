@@ -21,7 +21,6 @@ public class MappingUtility {
         .officialEmail(airlineDetailsDto.getOfficialEmail())
         .officialPhone(airlineDetailsDto.getOfficialPhone())
         .admin(admin)
-        .companySize(CompanySize.Small)
         .status("ACTIVE")
         .logo("logo")
         .employees(null)

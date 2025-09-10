@@ -48,7 +48,7 @@ public class BookingController {
     // Get booking by ID
     @GetMapping("/{bookingId}")
     public ResponseEntity<Booking> getBookingById(@PathVariable UUID bookingId) {
-        Booking booking = bookingRepository.findById(bookingId.toString()).orElse(null);
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
         if (booking == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -64,8 +64,8 @@ public class BookingController {
         }
 
         Customer customer = customerRepository.findById(booking.getCustomer().getCustomerId()).orElse(null);
-        Flight flight = flightRepository.findById(booking.getFlight().getFlightId().toString()).orElse(null);
-        Seat seat = seatRepository.findById(booking.getSeat().getSeatId().toString()).orElse(null);
+        Flight flight = flightRepository.findById(booking.getFlight().getFlightId()).orElse(null);
+        Seat seat = seatRepository.findById(booking.getSeat().getSeatId()).orElse(null);
 
         if (customer == null || flight == null || seat == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -88,7 +88,7 @@ public class BookingController {
     // Delete booking
     @DeleteMapping("/{bookingId}")
     public ResponseEntity<Void> deleteBooking(@PathVariable UUID bookingId) {
-        Booking booking = bookingRepository.findById(bookingId.toString()).orElse(null);
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
         if (booking == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -100,7 +100,7 @@ public class BookingController {
     // Update booking
     @PutMapping("/{bookingId}")
     public ResponseEntity<Booking> updateBooking(@PathVariable UUID bookingId, @RequestBody Booking updatedBooking) {
-        Booking booking = bookingRepository.findById(bookingId.toString()).orElse(null);
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
         if (booking == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
