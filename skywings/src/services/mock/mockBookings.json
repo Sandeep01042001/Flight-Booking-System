@@ -1,0 +1,10 @@
+[
+  {
+    "id": "B001",
+    "customerId": "C001",
+    "flightId": "F001",
+    "seat": "12A",
+    "status": "CONFIRMED",
+    "paymentStatus": "SUCCESS"
+  }
+]

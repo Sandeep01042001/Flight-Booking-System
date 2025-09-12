@@ -1,5 +1,6 @@
 package com.FBS.Airline_api.contoller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,8 @@ import com.FBS.Airline_api.service.AirlineService;
 public class AirlineController {
 
     AirlineService airlineService;
+    
+    @Autowired
     public AirlineController(AirlineService airlineService) {
         this.airlineService = airlineService;
     }

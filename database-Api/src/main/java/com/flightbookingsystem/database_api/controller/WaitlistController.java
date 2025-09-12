@@ -43,7 +43,7 @@ public class WaitlistController {
     // Get waitlist by ID
     @GetMapping("/{waitlistId}")
     public ResponseEntity<WaitList> getWaitListById(@PathVariable UUID waitlistId) {
-        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
+        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -56,7 +56,7 @@ public class WaitlistController {
                                                    @PathVariable UUID flightId,
                                                    @RequestBody WaitList waitList) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
 
         if (customer == null || flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -73,7 +73,7 @@ public class WaitlistController {
     @PutMapping("/{waitlistId}")
     public ResponseEntity<WaitList> updateWaitList(@PathVariable UUID waitlistId,
                                                    @RequestBody WaitList updatedWaitList) {
-        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
+        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -96,7 +96,7 @@ public class WaitlistController {
     // Delete waitlist
     @DeleteMapping("/{waitlistId}")
     public ResponseEntity<Void> deleteWaitList(@PathVariable UUID waitlistId) {
-        WaitList waitList = waitListRepository.findById(waitlistId.toString()).orElse(null);
+        WaitList waitList = waitListRepository.findById(waitlistId).orElse(null);
         if (waitList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

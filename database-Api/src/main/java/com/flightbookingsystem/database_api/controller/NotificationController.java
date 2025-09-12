@@ -36,7 +36,7 @@ public class NotificationController {
 
     // Get notification by ID
     @GetMapping("/{notificationId}")
-    public ResponseEntity<Notification> getNotificationById(@PathVariable String notificationId) {
+    public ResponseEntity<Notification> getNotificationById(@PathVariable UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId).orElse(null);
         if (notification == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -64,7 +64,7 @@ public class NotificationController {
     @PutMapping("/{notificationId}")
     public ResponseEntity<Notification> updateNotification(@PathVariable UUID notificationId,
                                                            @RequestBody Notification updatedNotification) {
-        Notification notification = notificationRepository.findById(notificationId.toString()).orElse(null);
+        Notification notification = notificationRepository.findById(notificationId).orElse(null);
         if (notification == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -80,7 +80,7 @@ public class NotificationController {
     // Delete notification
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable UUID notificationId) {
-        Notification notification = notificationRepository.findById(notificationId.toString()).orElse(null);
+        Notification notification = notificationRepository.findById(notificationId).orElse(null);
         if (notification == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

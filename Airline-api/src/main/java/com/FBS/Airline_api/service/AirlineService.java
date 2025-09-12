@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.FBS.Airline_api.contectors.DatabaseApiContectors;
 import com.FBS.Airline_api.dto.AirlineDetailsDto;
+import com.FBS.Airline_api.enums.CompanySize;
 import com.FBS.Airline_api.enums.EmployeeRole;
 import com.FBS.Airline_api.model.Airline;
 import com.FBS.Airline_api.model.Employee;
@@ -27,6 +28,11 @@ public class AirlineService {
         // we need to create airline and employee
         Airline airline = mappingUtility.mapToAirline(airlineDetailsDto, EmployeeRole.ADMIN);
 
+        airline.setCompanySize(CompanySize.valueOf(
+            airlineDetailsDto.getCompanySize().substring(0,1).toUpperCase() +
+            airlineDetailsDto.getCompanySize().substring(1).toLowerCase()
+        ));
+            
         Employee admin = mappingUtility.mapToEmployee(airlineDetailsDto, EmployeeRole.ADMIN); 
         admin.setAirlineName(airline);
 

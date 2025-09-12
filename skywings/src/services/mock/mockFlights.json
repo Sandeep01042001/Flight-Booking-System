@@ -1,0 +1,22 @@
+[
+  {
+    "id": "F001",
+    "origin": "DEL",
+    "destination": "BOM",
+    "date": "2025-09-15",
+    "airline": "SkyWings Air",
+    "price": 4500,
+    "availableSeats": 35,
+    "aircraft": "Airbus A320"
+  },
+  {
+    "id": "F002",
+    "origin": "DEL",
+    "destination": "BLR",
+    "date": "2025-09-16",
+    "airline": "SkyWings Express",
+    "price": 5200,
+    "availableSeats": 28,
+    "aircraft": "Boeing 737"
+  }
+]

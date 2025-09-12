@@ -33,7 +33,7 @@ public class AircraftController {
 
     @GetMapping("/{aircraftId}")
     public ResponseEntity<Aircraft> getAircraftById(@PathVariable UUID aircraftId) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
+        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -42,7 +42,7 @@ public class AircraftController {
 
     @PostMapping("/create/{airlineId}")
     public ResponseEntity<Aircraft> createAircraft(@PathVariable UUID airlineId, @RequestBody Aircraft aircraft) {
-        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
+        Airline airline = airlineRepository.findById(airlineId).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -54,7 +54,7 @@ public class AircraftController {
 
     @PutMapping("/{aircraftId}")
     public ResponseEntity<Aircraft> updateAircraft(@PathVariable UUID aircraftId, @RequestBody Aircraft updatedAircraft) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
+        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -76,7 +76,7 @@ public class AircraftController {
     // Get all flights of an aircraft
     @GetMapping("/{aircraftId}/flights")
     public ResponseEntity<List> getFlightsOfAircraft(@PathVariable UUID aircraftId) {
-        Aircraft aircraft = aircraftRepository.findById(aircraftId.toString()).orElse(null);
+        Aircraft aircraft = aircraftRepository.findById(aircraftId).orElse(null);
         if (aircraft == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

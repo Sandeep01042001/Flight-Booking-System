@@ -43,7 +43,7 @@ public class FeedbackController {
     // Get feedback by ID
     @GetMapping("/{feedbackId}")
     public ResponseEntity<FeedBack> getFeedbackById(@PathVariable UUID feedbackId) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
+        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -56,7 +56,7 @@ public class FeedbackController {
                                                    @PathVariable UUID flightId,
                                                    @RequestBody FeedBack feedback) {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        Flight flight = flightRepository.findById(flightId.toString()).orElse(null);
+        Flight flight = flightRepository.findById(flightId).orElse(null);
 
         if (customer == null || flight == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -74,7 +74,7 @@ public class FeedbackController {
     @PutMapping("/{feedbackId}")
     public ResponseEntity<FeedBack> updateFeedback(@PathVariable UUID feedbackId,
                                                    @RequestBody FeedBack updatedFeedback) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
+        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -96,7 +96,7 @@ public class FeedbackController {
     // Delete feedback
     @DeleteMapping("/{feedbackId}")
     public ResponseEntity<Void> deleteFeedback(@PathVariable UUID feedbackId) {
-        FeedBack feedback = feedBackRepository.findById(feedbackId.toString()).orElse(null);
+        FeedBack feedback = feedBackRepository.findById(feedbackId).orElse(null);
         if (feedback == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

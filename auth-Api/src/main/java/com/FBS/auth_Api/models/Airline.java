@@ -17,10 +17,13 @@ public class Airline {
     private UUID airlineId;
     private String name;
     private String officialName;
+    private String OfficialEmail;
+    private String OfficialPhone;
     private String address;
     private CompanySize companySize;
     private String logo;
     private String status;
+    private Employee admin;
     private List<Employee> employees;
     private List<Aircraft> aircrafts;
     private List<Flight> flights;

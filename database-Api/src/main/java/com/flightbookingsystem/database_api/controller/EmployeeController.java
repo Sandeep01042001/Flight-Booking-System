@@ -37,9 +37,9 @@ public class EmployeeController {
     }
 
     // Get employee by ID
-    @GetMapping("/{employeeId}")
+    @GetMapping("/get/{employeeId}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable UUID employeeId) {
-        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -53,9 +53,9 @@ public class EmployeeController {
 
 
     // Create a new employee with airline id
-    @PostMapping("/create/{airlineId}")
+    @PostMapping("/create/{airlineId}") 
     public ResponseEntity<Employee> createEmployee(@PathVariable UUID airlineId, @RequestBody Employee employee) {
-        Airline airline = airlineRepository.findById(airlineId.toString()).orElse(null);
+        Airline airline = airlineRepository.findById(airlineId).orElse(null);
         if (airline == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -68,7 +68,7 @@ public class EmployeeController {
     // Update employee
     @PutMapping("/{employeeId}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable UUID employeeId, @RequestBody Employee updatedEmployee) {
-        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -90,7 +90,7 @@ public class EmployeeController {
     // Delete employee
     @DeleteMapping("/{employeeId}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable UUID employeeId) {
-        Employee employee = employeeRepository.findById(employeeId.toString()).orElse(null);
+        Employee employee = employeeRepository.findById(employeeId).orElse(null);
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
