@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import Button from '../components/ui/buttons/Button';
+import Input from '../components/ui/forms/Input';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +24,7 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
+    // Simulate API call
     setTimeout(() => {
       console.log('Form submitted:', formData);
       setIsSubmitting(false);
@@ -34,227 +36,197 @@ const Contact = () => {
         message: ''
       });
       
-      // Reset status after 5 seconds
-      setTimeout(() => setSubmitStatus(null), 5000);
-    }, 1500);
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+    }, 1000);
   };
 
-  const contactInfo = [
-    {
-      icon: '📍',
-      title: 'Visit Us',
-      detail: '123 Skyline Drive, Suite 1000, New York, NY 10001',
-      link: 'https://maps.google.com',
-      linkText: 'View on Map'
-    },
-    {
-      icon: '📞',
-      title: 'Call Us',
-      detail: '+1 (555) 123-4567',
-      link: 'tel:+15551234567',
-      linkText: 'Call Now'
-    },
-    {
-      icon: '✉️',
-      title: 'Email Us',
-      detail: 'support@skywings.com',
-      link: 'mailto:support@skywings.com',
-      linkText: 'Send Email'
-    },
-    {
-      icon: '🕒',
-      title: 'Working Hours',
-      detail: 'Monday - Friday: 9:00 AM - 8:00 PM (EST)',
-      detail2: 'Saturday - Sunday: 10:00 AM - 6:00 PM (EST)'
-    }
-  ];
-
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="bg-blue-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl">We'd love to hear from you. Get in touch with our team.</p>
-        </div>
-      </div>
-
-      {/* Contact Info */}
-      <div className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {contactInfo.map((item, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-lg text-center">
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 mb-2">{item.detail}</p>
-                {item.detail2 && <p className="text-gray-600">{item.detail2}</p>}
-                {item.link && (
-                  <a 
-                    href={item.link} 
-                    className="mt-3 inline-block text-blue-600 hover:text-blue-800 font-medium"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {item.linkText}
-                  </a>
-                )}
-              </div>
-            ))}
+    <div className="bg-white">
+      {/* Hero banner */}
+      <div className="relative overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1521791055366-0d553872125f?q=80&w=1920&auto=format&fit=crop"
+          alt="Airplane taking off"
+          className="w-full h-64 md:h-80 object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        <div className="absolute inset-0 flex items-center justify-center px-4">
+          <div className="text-center text-white">
+            <h1 className="text-3xl md:text-5xl font-extrabold">Contact Skywings</h1>
+            <p className="mt-2 text-indigo-100 max-w-2xl mx-auto">We’re here to help with bookings, support, and partnerships.</p>
           </div>
         </div>
       </div>
 
-      {/* Contact Form */}
-      <div className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white shadow-lg rounded-lg p-8">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Send Us a Message</h2>
-            
-            {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-md">
-                Thank you for your message! We'll get back to you soon.
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="John Doe"
-                  />
+      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:py-20 lg:px-8">
+        <div className="max-w-2xl lg:max-w-4xl mx-auto">
+          <h2 className="text-3xl font-extrabold text-gray-900 text-center">
+            Contact Us
+          </h2>
+          <p className="mt-4 text-lg text-gray-500 text-center">
+            Have questions? We're here to help. Fill out the form below and our team will get back to you as soon as possible.
+          </p>
+          {/* Quick contact cards */}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-xl bg-gray-50 p-4 text-center shadow-sm">
+              <div className="text-sm text-gray-500">Call us</div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">+1 (555) 123-4567</div>
+            </div>
+            <div className="rounded-xl bg-gray-50 p-4 text-center shadow-sm">
+              <div className="text-sm text-gray-500">Email</div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">support@skywings.com</div>
+            </div>
+            <div className="rounded-xl bg-gray-50 p-4 text-center shadow-sm">
+              <div className="text-sm text-gray-500">Partnerships</div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">partner@skywings.com</div>
+            </div>
+          </div>
+          
+          {submitStatus === 'success' && (
+            <div className="mt-8 p-4 bg-green-50 rounded-md">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
                 </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="you@example.com"
-                  />
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">
+                    Thank you for your message! We'll get back to you soon.
+                  </p>
                 </div>
               </div>
-              
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject *
-                </label>
-                <input
+            </div>
+          )}
+
+          <div className="mt-12">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
+              <div className="sm:col-span-2">
+                <Input
+                  label="Full Name"
+                  id="name"
+                  name="name"
                   type="text"
-                  id="subject"
-                  name="subject"
-                  required
-                  value={formData.subject}
+                  value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="How can we help?"
+                  required
                 />
               </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="5"
-                  required
-                  value={formData.message}
+              <div className="sm:col-span-2">
+                <Input
+                  label="Email"
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Tell us more about how we can help you..."
-                ></textarea>
+                  required
+                />
               </div>
-              
-              <div className="text-center">
-                <button
+              <div className="sm:col-span-2">
+                <Input
+                  label="Subject"
+                  id="subject"
+                  name="subject"
+                  type="text"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                  Message
+                </label>
+                <div className="mt-1">
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    className="py-3 px-4 block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border border-gray-300 rounded-md"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="sm:col-span-2">
+                <Button
                   type="submit"
+                  variant="primary"
+                  className="w-full"
                   disabled={isSubmitting}
-                  className={`px-8 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
                 >
                   {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
-      </div>
 
-      {/* Map */}
-      <div className="h-96 w-full bg-gray-200">
-        <iframe
-          title="Our Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.2152091790147!2d-73.9878449244413!3d40.75085787138768!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
-          width="100%"
-          height="100%"
-          style={{ border: 0 }}
-          allowFullScreen=""
-          loading="lazy"
-        ></iframe>
-      </div>
-
-      {/* FAQ Section */}
-      <div className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Frequently Asked Questions</h2>
-          
-          <div className="space-y-6">
-            {[
-              {
-                question: 'How can I change or cancel my flight?',
-                answer: 'You can change or cancel your flight by logging into your account and accessing the "My Trips" section. Alternatively, you can contact our customer support team for assistance.'
-              },
-              {
-                question: 'What is your baggage allowance?',
-                answer: 'Baggage allowances vary depending on the airline and fare type. You can find specific details during the booking process or by checking the airline\'s website.'
-              },
-              {
-                question: 'How do I get a refund for my cancelled flight?',
-                answer: 'Refund eligibility depends on the fare rules of your ticket. Please contact our customer support team with your booking reference number for assistance with refunds.'
-              },
-              {
-                question: 'Can I select my seat in advance?',
-                answer: 'Yes, seat selection is available during the booking process or after booking through the "Manage My Booking" section. Some airlines may charge an additional fee for preferred seating.'
-              }
-            ].map((faq, index) => (
-              <div key={index} className="border-b border-gray-200 pb-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600">{faq.answer}</p>
+        <div className="mt-16 bg-gray-50 relative left-1/2 right-1/2 -mx-[50vw] w-screen py-8 sm:py-10">
+          {/* Subtle top gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-indigo-500/60 via-indigo-400/40 to-indigo-500/60" />
+          <div className="max-w-5xl mx-auto text-center px-4">
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Contact Center</h3>
+            <p className="mt-1 text-sm text-gray-500">We’re here to help. Reach us via phone, email, or visit our offices.</p>
+            <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 md:divide-x md:divide-gray-200">
+              {/* Column 1: Customer Support */}
+              <div className="px-6">
+                <h4 className="text-base font-medium text-gray-900">Customer Support</h4>
+                <dl className="mt-4 space-y-3">
+                  <div>
+                    <dt className="sr-only">Phone number</dt>
+                    <dd className="flex items-center justify-center">
+                      <svg className="flex-shrink-0 h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <a href="tel:+15551234567" className="ml-3 text-base text-indigo-600 hover:text-indigo-700">+1 (555) 123-4567</a>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Email</dt>
+                    <dd className="flex items-center justify-center">
+                      <svg className="flex-shrink-0 h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <a href="mailto:support@skywings.com" className="ml-3 text-base text-indigo-600 hover:text-indigo-700">support@skywings.com</a>
+                    </dd>
+                  </div>
+                </dl>
               </div>
-            ))}
-          </div>
-          
-          <div className="mt-12 text-center">
-            <p className="text-gray-600 mb-4">Didn't find the answer you were looking for?</p>
-            <a 
-              href="#contact-form" 
-              className="text-blue-600 hover:text-blue-800 font-medium"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              Contact our support team
-            </a>
+
+              {/* Column 2: New York */}
+              <div className="px-6">
+                <h4 className="text-base font-medium text-gray-900 inline-flex items-center justify-center">
+                  {/* location pin icon */}
+                  <svg className="h-4 w-4 text-indigo-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  New York
+                </h4>
+                <address className="mt-3 not-italic text-base text-gray-600 leading-relaxed">
+                  123 Aviation Way<br />
+                  New York, NY 10001<br />
+                  United States
+                </address>
+              </div>
+
+              {/* Column 3: London */}
+              <div className="px-6">
+                <h4 className="text-base font-medium text-gray-900 inline-flex items-center justify-center">
+                  {/* location pin icon */}
+                  <svg className="h-4 w-4 text-indigo-600 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  London
+                </h4>
+                <address className="mt-3 not-italic text-base text-gray-600 leading-relaxed">
+                  456 Skyline Road<br />
+                  London, EC1A 1BB<br />
+                  United Kingdom
+                </address>
+              </div>
+            </div>
           </div>
         </div>
       </div>

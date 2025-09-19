@@ -1,62 +1,91 @@
-import apiClient from './apiClient';
+import BaseService from './baseService';
+import api from './apiClient';
 
-const PAYMENT_API_BASE_URL = import.meta.env.VITE_PAYMENT_SERVICE_URL || 'http://localhost:8084';
-
-// Process a payment
-export const processPayment = async (paymentData) => {
-  try {
-    const response = await apiClient.post(
-      `${PAYMENT_API_BASE_URL}/api/v1/payments/process`,
-      paymentData
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
+class PaymentService extends BaseService {
+  constructor() {
+    super('payments');
   }
-};
 
-// Get payment details by ID
-export const getPaymentById = async (paymentId) => {
-  try {
-    const response = await apiClient.get(`${PAYMENT_API_BASE_URL}/api/v1/payments/${paymentId}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
-};
+  async processPayment(bookingId, paymentDetails) {
+    try {
+      // Get booking details
+      const booking = await api.get(`/bookings/${bookingId}`);
+      
+      if (!booking) {
+        throw new Error('Booking not found');
+      }
 
-// Refund a payment
-export const refundPayment = async (paymentId, amount) => {
-  try {
-    const response = await apiClient.post(
-      `${PAYMENT_API_BASE_URL}/api/v1/payments/${paymentId}/refund`,
-      { amount }
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
-};
+      if (booking.paymentStatus === 'paid') {
+        throw new Error('Payment already processed for this booking');
+      }
 
-// Get payment methods
-export const getPaymentMethods = async () => {
-  try {
-    const response = await apiClient.get(`${PAYMENT_API_BASE_URL}/api/v1/payments/methods`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
-};
+      // In a real app, this would interact with a payment gateway
+      const payment = await this.create({
+        bookingId,
+        amount: booking.totalAmount,
+        paymentMethod: paymentDetails.paymentMethod,
+        status: 'completed',
+        transactionId: `TXN${Date.now()}`,
+        paymentDate: new Date().toISOString(),
+        ...paymentDetails
+      });
 
-// Save payment method for future use
-export const savePaymentMethod = async (paymentMethodData) => {
-  try {
-    const response = await apiClient.post(
-      `${PAYMENT_API_BASE_URL}/api/v1/payments/methods`,
-      paymentMethodData
-    );
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
+      // Update booking payment status
+      await api.patch(`/bookings/${bookingId}`, {
+        paymentStatus: 'paid',
+        status: 'confirmed'
+      });
+
+      return payment;
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      throw error;
+    }
   }
-};
+
+  async getPaymentByBookingId(bookingId) {
+    try {
+      const payments = await this.getAll({ bookingId });
+      return payments[0]; // Assuming one payment per booking
+    } catch (error) {
+      console.error('Error fetching payment:', error);
+      throw error;
+    }
+  }
+
+  async refundPayment(paymentId) {
+    try {
+      const payment = await this.getById(paymentId);
+      
+      // In a real app, this would interact with a payment gateway
+      const refund = await this.update(paymentId, {
+        status: 'refunded',
+        refundDate: new Date().toISOString()
+      });
+
+      return refund;
+    } catch (error) {
+      console.error('Error processing refund:', error);
+      throw error;
+    }
+  }
+
+  async getPaymentHistory(userId, params = {}) {
+    try {
+      // First get user's bookings
+      const bookings = await api.get(`/bookings?userId=${userId}`);
+      const bookingIds = bookings.map(booking => booking.id);
+      
+      // Then get payments for those bookings
+      return await this.getAll({
+        ...params,
+        bookingId: bookingIds
+      });
+    } catch (error) {
+      console.error('Error fetching payment history:', error);
+      throw error;
+    }
+  }
+}
+
+export default new PaymentService();

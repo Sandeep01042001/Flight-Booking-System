@@ -32,7 +32,7 @@ public class EmployeeService {
         Airline airline = this.getAirlineFromDatabase(airlineId);
     
         if (airline == null) {
-            throw new RuntimeException("Airline not found with ID: " + airlineId);
+            throw new RuntimeException("airline is not exist");
         }
     
         Employee employee = mapUtility.mapToEmployee(employeeDTO);

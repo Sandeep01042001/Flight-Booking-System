@@ -1,114 +1,318 @@
-import { Routes, Route, useLocation, Navigate, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-
-// Create a custom history object
-const history = createBrowserHistory({
-  future: {
-    v7_startTransition: true, // Enable React.startTransition for state updates
-    v7_relativeSplatPath: true, // Enable new relative path resolution
-  },
-});
-import { Suspense, lazy } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { Toaster } from '@/components/ui/toaster';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AppProvider, useApp } from './context/AppContext';
+import Loader from './components/common/Loader';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import ToastHandler from './components/common/ToastHandler';
 
 // Layouts
-import MainLayout from './layouts/MainLayout';
+const MainLayout = lazy(() => import('./layouts/MainLayout'));
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+const AirlineLayout = lazy(() => import('./layouts/AirlineLayout'));
 
-// Lazy load pages
+// Public Pages
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
-const Flights = lazy(() => import('./pages/flights/Flights'));
-const SearchResults = lazy(() => import('./pages/flights/SearchResults'));
-const FlightDetails = lazy(() => import('./pages/flights/FlightDetails'));
-const Booking = lazy(() => import('./pages/booking/Booking'));
-const BookingHistory = lazy(() => import('./pages/booking/BookingHistory'));
+const FlightSearch = lazy(() => import('./pages/flight/FlightSearch'));
+const FlightDetails = lazy(() => import('./pages/flight/FlightDetails'));
+const PaymentPage = lazy(() => import('./pages/PaymentPage'));
 const BookingConfirmation = lazy(() => import('./pages/booking/BookingConfirmation'));
-const Confirmation = lazy(() => import('./pages/booking/Confirmation'));
-const Payment = lazy(() => import('./pages/booking/Payment'));
-const CheckIn = lazy(() => import('./pages/booking/CheckIn'));
-const BoardingPass = lazy(() => import('./pages/booking/BoardingPass'));
-const Profile = lazy(() => import('./pages/user/Profile'));
-const NotFound = lazy(() => import('./pages/errors/NotFound'));
-
-// Auth pages
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
-const AdminLogin = lazy(() => import('./pages/admin/Login'));
+const EmployeeRegister = lazy(() => import('./pages/auth/EmployeeRegister'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const Error404 = lazy(() => import('./pages/Error404'));
 
-// Admin pages
+// Customer Pages
+const CustomerDashboard = lazy(() => import('./pages/customer/Dashboard'));
+const CustomerBookings = lazy(() => import('./pages/customer/Bookings'));
+const CustomerProfile = lazy(() => import('./pages/customer/Profile'));
+const CustomerNotifications = lazy(() => import('./pages/customer/Notifications'));
+const CustomerPaymentMethods = lazy(() => import('./pages/customer/PaymentMethods'));
+// Booking Pages (public / semi-protected)
+const SeatSelection = lazy(() => import('./pages/SeatSelection'));
+
+// Admin Pages
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
-const EmployeeDashboard = lazy(() => import('./pages/employee/Dashboard'));
+const AdminFlights = lazy(() => import('./pages/admin/Flights'));
+const AdminBookings = lazy(() => import('./pages/admin/Bookings'));
+const AdminUsers = lazy(() => import('./pages/admin/Users'));
+const AdminAirlines = lazy(() => import('./pages/admin/Airlines'));
+const AdminAirports = lazy(() => import('./pages/admin/Airports'));
+const AdminReports = lazy(() => import('./pages/admin/Reports'));
+const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
-// Loading component
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
+// Airline Pages
+const AirlineHome = lazy(() => import('./pages/airline/AirlineHome'));
+const AirlineDashboard = lazy(() => import('./pages/airline/AirlineDashboard'));
+const AirlineFlights = lazy(() => import('./pages/airline/ManageFlights'));
+const AirlineAircrafts = lazy(() => import('./pages/airline/ManageAircrafts'));
+const AirlineEmployees = lazy(() => import('./pages/airline/ManageEmployees'));
+const AirlineSchedule = lazy(() => import('./pages/airline/ManageSchedule'));
+const AirlineReports = lazy(() => import('./pages/airline/Reports'));
+const AirlineSettings = lazy(() => import('./pages/airline/Settings'));
 
-// Main App Component
-const App = () => {
-  const location = useLocation();
+// Employee Pages
+const EmployeeHome = lazy(() => import('./pages/employee/EmployeeHome'));
+const EmployeeDashboard = lazy(() => import('./pages/employee/EmployeeDashboard'));
+const EmployeeFlights = lazy(() => import('./pages/employee/FlightAssignments'));
+const EmployeeSchedule = lazy(() => import('./pages/employee/EmployeeSchedule'));
+const EmployeeNotifications = lazy(() => import('./pages/employee/Notifications'));
+const EmployeeProfile = lazy(() => import('./pages/employee/Profile'));
+const EmployeeSettings = lazy(() => import('./pages/employee/Settings'));
 
-  // Apply future flags to the router
-  if (window.__reactRouterPkg) {
-    window.__reactRouterPkg.enableFutureFlags({
-      v7_startTransition: true,
-      v7_relativeSplatPath: true,
-    });
+// Protected Route Component
+const ProtectedRoute = ({ children, requiredRole = null }) => {
+  const { isAuthenticated, user, loading, isAdmin, isEmployee } = useApp();
+  
+  if (loading) {
+    return <Loader fullScreen />;
   }
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-      <div className="min-h-screen bg-gray-50">
-        <Toaster />
-        <AnimatePresence mode="wait">
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes location={location} key={location.pathname}>
-              <Route element={<MainLayout />}>
-                {/* Public routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/flights" element={<Flights />} />
-                <Route path="/flights/search" element={<SearchResults />} />
-                <Route path="/flights/:id" element={<FlightDetails />} />
-                <Route path="/booking" element={<Booking />} />
-                <Route path="/booking/confirmation/:id" element={<BookingConfirmation />} />
-                <Route path="/booking/confirmation/success/:id" element={<Confirmation />} />
-                <Route path="/bookings" element={<BookingHistory />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/checkin" element={<CheckIn />} />
-                <Route path="/boarding-pass" element={<BoardingPass />} />
-                <Route path="/profile" element={<Profile />} />
-                
-                {/* Auth routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                
-                {/* Admin routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/flights" element={<div>Flight Management</div>} />
-                
-                {/* Employee routes */}
-                <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-                <Route path="/employee/checkin" element={<div>Passenger Check-in</div>} />
-                
-                {/* Error pages */}
-                <Route path="/404" element={<NotFound />} />
-                
-                {/* Redirect unknown routes to 404 */}
-                <Route path="*" element={<Navigate to="/404" replace />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </AnimatePresence>
-      </div>
-    </div>
-  );
+  if (!isAuthenticated) {
+    // Store the intended URL before redirecting to login
+    return <Navigate to="/login" state={{ from: window.location.pathname }} replace />;
+  }
+
+  // Handle role-based access
+  if (requiredRole) {
+    // If requiredRole is an array, check if user's role is in the array
+    if (Array.isArray(requiredRole)) {
+      if (!requiredRole.includes(user.role)) {
+        toast.error('You do not have permission to access this page');
+        // Redirect to appropriate dashboard based on user role
+        return <Navigate to={getDashboardPath(user.role)} replace />;
+      }
+    } 
+    // If requiredRole is a string, check for exact match
+    else if (user.role !== requiredRole) {
+      toast.error('You do not have permission to access this page');
+      return <Navigate to={getDashboardPath(user.role)} replace />;
+    }
+  }
+  
+  // Helper function to get dashboard path based on role
+  function getDashboardPath(role) {
+    switch(role) {
+      case 'admin':
+        return '/admin/dashboard';
+      case 'employee':
+      case 'pilot':
+      case 'flight_attendant':
+      case 'crew':
+        return '/employee';
+      case 'customer':
+        return '/dashboard';
+      default:
+        return '/';
+    }
+  }
+
+  return children;
 };
+
+// Main App Component
+function App() {
+  return (
+    <AppProvider>
+      <ErrorBoundary>
+        <div className="App">
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+          <ToastHandler />
+          
+          <Suspense fallback={<Loader fullScreen />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="flights" element={<FlightSearch />} />
+              <Route path="flights/:id" element={<FlightDetails />} />
+              <Route 
+                path="flights/:id/seats" 
+                element={
+                  <ProtectedRoute requiredRole="customer">
+                    <SeatSelection />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="payment" 
+                element={
+                  <ProtectedRoute requiredRole="customer">
+                    <PaymentPage />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="booking/confirmation/:id" element={<BookingConfirmation />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="employee/register" element={<EmployeeRegister />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password/:token" element={<ResetPassword />} />
+              
+              {/* Customer Routes */}
+              <Route 
+                path="dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="customer">
+                    <CustomerDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="my-bookings" 
+                element={
+                  <ProtectedRoute>
+                    <CustomerBookings />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="profile" 
+                element={
+                  <ProtectedRoute>
+                    <CustomerProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="notifications" 
+                element={
+                  <ProtectedRoute requiredRole="customer">
+                    <CustomerNotifications />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="payment-methods" 
+                element={
+                  <ProtectedRoute requiredRole="customer">
+                    <CustomerPaymentMethods />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="airline-dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="airline">
+                    <AirlineHome />
+                  </ProtectedRoute>
+                } 
+              />
+              {/* 404 Route */}
+              <Route path="*" element={<Error404 />} />
+            </Route>
+            
+            {/* Airline Admin Routes */}
+            <Route 
+              path="airline" 
+              element={
+                <ProtectedRoute requiredRole="airline">
+                  <AirlineLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AirlineHome />} />
+              <Route path="dashboard" element={<AirlineDashboard />} />
+              <Route path="flights" element={<AirlineFlights />} />
+              <Route path="aircrafts" element={<AirlineAircrafts />} />
+              <Route path="employees" element={<AirlineEmployees />} />
+              <Route path="schedule" element={<AirlineSchedule />} />
+              <Route path="reports" element={<AirlineReports />} />
+              <Route path="settings" element={<AirlineSettings />} />
+              <Route path="*" element={<Navigate to="/airline" replace />} />
+            </Route>
+            
+            {/* Admin Routes */}
+            <Route 
+              path="admin" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="flights" element={<AdminFlights />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="airlines" element={<AdminAirlines />} />
+              <Route path="airports" element={<AdminAirports />} />
+              <Route path="reports" element={<AdminReports />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
+
+            {/* Airline Routes */}
+            <Route 
+              path="airline" 
+              element={
+                <ProtectedRoute requiredRole="airline">
+                  <AdminLayout type="airline" />
+                </ProtectedRoute>
+              }
+            >
+              <Route 
+                index
+                element={
+                  <Navigate to="/airline/dashboard" replace />
+                }
+              />
+              <Route 
+                path="dashboard" 
+                element={
+                  <ProtectedRoute requiredRole="airline">
+                    <AirlineHome />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="flights" element={<AirlineFlights />} />
+              <Route path="aircrafts" element={<AirlineAircrafts />} />
+              <Route path="employees" element={<AirlineEmployees />} />
+              <Route path="schedule" element={<AirlineSchedule />} />
+              <Route path="reports" element={<AirlineReports />} />
+              <Route path="settings" element={<AirlineSettings />} />
+            </Route>
+
+            {/* Employee Routes */}
+            <Route 
+              path="employee" 
+              element={
+                <ProtectedRoute requiredRole={['employee', 'pilot', 'flight_attendant', 'crew']}>
+                  <EmployeeDashboard />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<EmployeeHome />} />
+              <Route path="dashboard" element={<EmployeeHome />} />
+              <Route path="flights" element={<EmployeeFlights />} />
+              <Route path="schedule" element={<EmployeeSchedule />} />
+              <Route path="notifications" element={<EmployeeNotifications />} />
+              <Route path="profile" element={<EmployeeProfile />} />
+              <Route path="settings" element={<EmployeeSettings />} />
+            </Route>
+          </Routes>
+          </Suspense>
+        </div>
+      </ErrorBoundary>
+    </AppProvider>
+  );
+}
 
 export default App;

@@ -9,9 +9,15 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.FBS</groupId>
+<<<<<<<< HEAD:Customer-Api/pom.xml
 	<artifactId>Customer-Api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Customer-Api</name>
+========
+	<artifactId>employee-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>employee-api</name>
+>>>>>>>> bcda2edab6a88ed4cb62c15eec38f47fb798cfe6:employee-api/pom.xml
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -32,6 +38,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+<<<<<<<< HEAD:Customer-Api/pom.xml
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
@@ -44,11 +51,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+========
+>>>>>>>> bcda2edab6a88ed4cb62c15eec38f47fb798cfe6:employee-api/pom.xml
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
 		<!-- WebClient for reactive HTTP calls -->
 		<dependency>
+<<<<<<<< HEAD:Customer-Api/pom.xml
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
@@ -65,6 +75,8 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+========
+>>>>>>>> bcda2edab6a88ed4cb62c15eec38f47fb798cfe6:employee-api/pom.xml
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>

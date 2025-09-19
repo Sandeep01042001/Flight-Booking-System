@@ -1,0 +1,184 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "john.doe@example.com",
+      "password": "hashed_password_123",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "+1234567890",
+      "role": "customer",
+      "createdAt": "2023-09-01T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "email": "admin@skywings.com",
+      "password": "admin_hashed_password",
+      "firstName": "Admin",
+      "lastName": "User",
+      "phone": "+1987654321",
+      "role": "admin",
+      "createdAt": "2023-01-01T09:00:00Z"
+    }
+  ],
+  "airlines": [
+    {
+      "id": 1,
+      "name": "SkyWings",
+      "code": "SW",
+      "logoUrl": "/logos/skywings.png"
+    },
+    {
+      "id": 2,
+      "name": "Global Air",
+      "code": "GA",
+      "logoUrl": "/logos/global_air.png"
+    },
+    {
+      "id": 3,
+      "name": "Oceanic",
+      "code": "OC",
+      "logoUrl": "/logos/oceanic.png"
+    }
+  ],
+  "airports": [
+    {
+      "id": 1,
+      "code": "JFK",
+      "name": "John F. Kennedy International Airport",
+      "city": "New York",
+      "country": "USA",
+      "timezone": "America/New_York"
+    },
+    {
+      "id": 2,
+      "code": "LAX",
+      "name": "Los Angeles International Airport",
+      "city": "Los Angeles",
+      "country": "USA",
+      "timezone": "America/Los_Angeles"
+    },
+    {
+      "id": 3,
+      "code": "LHR",
+      "name": "Heathrow Airport",
+      "city": "London",
+      "country": "UK",
+      "timezone": "Europe/London"
+    },
+    {
+      "id": 4,
+      "code": "DXB",
+      "name": "Dubai International Airport",
+      "city": "Dubai",
+      "country": "UAE",
+      "timezone": "Asia/Dubai"
+    }
+  ],
+  "flights": [
+    {
+      "id": 1,
+      "flightNumber": "SW101",
+      "airlineId": 1,
+      "departureAirportId": 1,
+      "arrivalAirportId": 2,
+      "departureTime": "2023-10-15T08:00:00-04:00",
+      "arrivalTime": "2023-10-15T11:30:00-07:00",
+      "duration": 330,
+      "price": 299.99,
+      "totalSeats": 200,
+      "availableSeats": 150,
+      "status": "scheduled"
+    },
+    {
+      "id": 2,
+      "flightNumber": "GA202",
+      "airlineId": 2,
+      "departureAirportId": 3,
+      "arrivalAirportId": 4,
+      "departureTime": "2023-10-16T14:30:00+01:00",
+      "arrivalTime": "2023-10-17T01:15:00+04:00",
+      "duration": 465,
+      "price": 599.99,
+      "totalSeats": 300,
+      "availableSeats": 125,
+      "status": "scheduled"
+    },
+    {
+      "id": 3,
+      "flightNumber": "OC303",
+      "airlineId": 3,
+      "departureAirportId": 2,
+      "arrivalAirportId": 3,
+      "departureTime": "2023-10-17T09:45:00-07:00",
+      "arrivalTime": "2023-10-17T18:30:00+01:00",
+      "duration": 585,
+      "price": 499.99,
+      "totalSeats": 250,
+      "availableSeats": 75,
+      "status": "scheduled"
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "userId": 1,
+      "flightId": 1,
+      "passengers": [
+        {
+          "firstName": "John",
+          "lastName": "Doe",
+          "passportNumber": "AB1234567",
+          "seatNumber": "12A"
+        }
+      ],
+      "totalAmount": 299.99,
+      "status": "confirmed",
+      "bookingDate": "2023-09-10T14:30:00Z",
+      "paymentStatus": "paid"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "flightId": 3,
+      "passengers": [
+        {
+          "firstName": "John",
+          "lastName": "Doe",
+          "passportNumber": "AB1234567",
+          "seatNumber": "8B"
+        },
+        {
+          "firstName": "Jane",
+          "lastName": "Doe",
+          "passportNumber": "CD9876543",
+          "seatNumber": "8C"
+        }
+      ],
+      "totalAmount": 999.98,
+      "status": "confirmed",
+      "bookingDate": "2023-09-05T10:15:00Z",
+      "paymentStatus": "paid"
+    }
+  ],
+  "payments": [
+    {
+      "id": 1,
+      "bookingId": 1,
+      "amount": 299.99,
+      "paymentMethod": "credit_card",
+      "transactionId": "TXN123456789",
+      "status": "completed",
+      "paymentDate": "2023-09-10T14:32:15Z"
+    },
+    {
+      "id": 2,
+      "bookingId": 2,
+      "amount": 999.98,
+      "paymentMethod": "paypal",
+      "transactionId": "PP987654321",
+      "status": "completed",
+      "paymentDate": "2023-09-05T10:18:30Z"
+    }
+  ]
+}

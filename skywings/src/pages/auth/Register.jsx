@@ -1,402 +1,799 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Mail, Lock, User, Phone, Eye, EyeOff, AlertCircle, Check } from 'lucide-react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { toast } from 'react-toastify';
+import useAuth from '../../hooks/useAuth';
+import Button from '../../components/ui/buttons/Button';
+import Input from '../../components/ui/form/Input';
+import Select from '../../components/ui/form/Select';
+
+// Role options for registration
+const ROLE_OPTIONS = [
+  { value: 'customer', label: 'Customer', icon: '👤' },
+  { value: 'employee', label: 'Employee', icon: '👨‍✈️' },
+  { value: 'airline', label: 'Airline Admin', icon: '✈️' },
+];
+
+// Employee position options
+const EMPLOYEE_POSITIONS = [
+  { value: 'pilot', label: 'Pilot' },
+  { value: 'flight_attendant', label: 'Flight Attendant' },
+  { value: 'ground_staff', label: 'Ground Staff' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'customer_service', label: 'Customer Service' },
+  { value: 'other', label: 'Other' },
+];
+
+// Airline types
+const AIRLINE_TYPES = [
+  { value: 'commercial', label: 'Commercial Airline' },
+  { value: 'cargo', label: 'Cargo Airline' },
+  { value: 'charter', label: 'Charter Airline' },
+  { value: 'regional', label: 'Regional Airline' },
+];
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Password requirements
-  const [passwordRequirements, setPasswordRequirements] = useState({
-    hasMinLength: false,
-    hasUppercase: false,
-    hasNumber: false,
-    hasSpecialChar: false,
-  });
+  // Get role from URL query params or default to customer
+  const searchParams = new URLSearchParams(location.search);
+  const defaultRole = searchParams.get('role') || 'customer';
   
-  // Form validation
-  const validateForm = () => {
-    if (!formData.firstName || !formData.lastName) {
-      setError('Please enter your full name');
-      return false;
-    }
-    if (!formData.email) {
-      setError('Email is required');
-      return false;
-    }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return false;
-    }
-    if (!formData.phone) {
-      setError('Phone number is required');
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match");
-      return false;
-    }
-    
-    // Check password requirements
-    const requirements = {
-      hasMinLength: formData.password.length >= 8,
-      hasUppercase: /[A-Z]/.test(formData.password),
-      hasNumber: /[0-9]/.test(formData.password),
-      hasSpecialChar: /[^A-Za-z0-9]/.test(formData.password),
-    };
-    
-    setPasswordRequirements(requirements);
-    
-    if (!Object.values(requirements).every(Boolean)) {
-      setError('Please ensure your password meets all requirements');
-      return false;
-    }
-    
-    setError('');
-    return true;
-  };
+  const [userType, setUserType] = useState(defaultRole);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Update password requirements in real-time
-    if (name === 'password') {
-      setPasswordRequirements({
-        hasMinLength: value.length >= 8,
-        hasUppercase: /[A-Z]/.test(value),
-        hasNumber: /[0-9]/.test(value),
-        hasSpecialChar: /[^A-Za-z0-9]/.test(value),
-      });
-    }
-  };
+  const formik = useFormik({
+    validateOnMount: true,
+    enableReinitialize: true,
+    initialValues: {
+      // Common fields
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      dateOfBirth: '',
+      gender: '',
+      acceptTerms: false,
+      role: defaultRole,
+      
+      // Employee specific
+      employeeId: '',
+      position: '',
+      hireDate: '',
+      department: '',
+      
+      // Airline specific
+      airlineName: '',
+      airlineCode: '',
+      airlineType: '',
+      iataCode: '',
+      icaoCode: '',
+      
+      // Address
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+      postalCode: '',
+    },
+    validationSchema: Yup.object().shape({
+      // Common fields
+      firstName: Yup.string()
+        .required('First name is required')
+        .min(2, 'First name must be at least 2 characters'),
+      lastName: Yup.string()
+        .required('Last name is required')
+        .min(2, 'Last name must be at least 2 characters'),
+      email: Yup.string()
+        .email('Invalid email address')
+        .required('Email is required')
+        .test('email-domain', 'Invalid email domain for selected role', function(value) {
+          if (!value || !this.parent.role) return true;
+          
+          if (this.parent.role === 'employee' && !value.endsWith('@skywings.com')) {
+            return this.createError({
+              message: 'Employee email must be a SkyWings email'
+            });
+          }
+          
+          if (this.parent.role === 'airline' && !value.endsWith('@airline.com')) {
+            return this.createError({
+              message: 'Airline admin email must be an airline domain'
+            });
+          }
+          
+          return true;
+        }),
+      password: Yup.string()
+        .min(8, 'Password must be at least 8 characters')
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+          'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+        )
+        .required('Password is required'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password'), null], 'Passwords must match')
+        .required('Please confirm your password'),
+      phone: Yup.string()
+        .matches(/^[0-9]{10,15}$/, 'Phone number must be between 10-15 digits')
+        .required('Phone number is required'),
+      dateOfBirth: Yup.date()
+        .max(new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000), 'You must be at least 18 years old')
+        .required('Date of birth is required'),
+      gender: Yup.string()
+        .oneOf(['male', 'female', 'other', 'prefer-not-to-say'], 'Please select a valid gender')
+        .required('Gender is required'),
+      acceptTerms: Yup.boolean()
+        .oneOf([true], 'You must accept the terms and conditions')
+        .required('You must accept the terms and conditions'),
+      role: Yup.string()
+        .required('Role is required'),
+      
+      // Employee fields (conditionally required)
+      employeeId: Yup.string().when('role', {
+        is: 'employee',
+        then: Yup.string().required('Employee ID is required'),
+        otherwise: Yup.string()
+      }),
+      position: Yup.string().when('role', {
+        is: 'employee',
+        then: Yup.string().required('Position is required'),
+        otherwise: Yup.string()
+      }),
+      hireDate: Yup.date().when('role', {
+        is: 'employee',
+        then: Yup.date()
+          .required('Hire date is required')
+          .max(new Date(), 'Hire date cannot be in the future'),
+        otherwise: Yup.date()
+      }),
+      
+      // Airline fields (conditionally required)
+      airlineName: Yup.string().when('role', {
+        is: 'airline',
+        then: Yup.string()
+          .required('Airline name is required')
+          .min(2, 'Airline name must be at least 2 characters'),
+        otherwise: Yup.string()
+      }),
+      airlineCode: Yup.string().when('role', {
+        is: 'airline',
+        then: Yup.string()
+          .required('Airline code is required')
+          .max(3, 'Airline code must be 2-3 characters'),
+        otherwise: Yup.string()
+      }),
+      airlineType: Yup.string().when('role', {
+        is: 'airline',
+        then: Yup.string()
+          .required('Airline type is required'),
+        otherwise: Yup.string()
+      }),
+      iataCode: Yup.string().when('role', {
+        is: 'airline',
+        then: Yup.string()
+          .required('IATA code is required')
+          .length(2, 'IATA code must be exactly 2 characters')
+          .matches(/^[A-Z0-9]+$/, 'IATA code must be alphanumeric and uppercase'),
+        otherwise: Yup.string()
+      }),
+      icaoCode: Yup.string().when('role', {
+        is: 'airline',
+        then: Yup.string()
+          .required('ICAO code is required')
+          .length(3, 'ICAO code must be exactly 3 characters')
+          .matches(/^[A-Z0-9]+$/, 'ICAO code must be alphanumeric and uppercase'),
+        otherwise: Yup.string()
+      })
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        setLoading(true);
+        
+        // Prepare user data based on role
+        const { confirmPassword, acceptTerms, ...userData } = values;
+        userData.role = userType; // Explicitly set the role from state
+        
+        // Add role-specific data
+        if (userType === 'employee') {
+          userData.employeeDetails = {
+            employeeId: values.employeeId,
+            position: values.position,
+            hireDate: values.hireDate,
+            department: values.department
+          };
+        } else if (userType === 'airline') {
+          // Ensure all required airline fields are present
+          if (!values.airlineName || !values.airlineCode || !values.airlineType || !values.iataCode || !values.icaoCode) {
+            throw new Error('Please fill in all required airline information');
+          }
+          
+          userData.airlineDetails = {
+            name: values.airlineName,
+            code: values.airlineCode,
+            type: values.airlineType,
+            iataCode: values.iataCode,
+            icaoCode: values.icaoCode
+          };
+        }
+        
+        // Add address
+        userData.address = {
+          street: values.address,
+          city: values.city,
+          state: values.state,
+          country: values.country,
+          postalCode: values.postalCode
+        };
+        
+        // Set the role
+        userData.role = userType;
+        
+        // Call register API
+        const result = await register(userData);
+        
+        // Handle the response based on user type and registration result
+        if (userType === 'airline') {
+          if (result.requiresApproval) {
+            toast.success('Registration submitted for approval. You will receive an email once your account is approved.');
+            navigate('/login', { 
+              state: { 
+                message: 'Registration submitted for approval. You will receive an email once your account is approved.'
+              } 
+            });
+          } else {
+            // This case should not normally happen for airline registration
+            toast.success('Registration successful! You can now log in.');
+            navigate('/login', { 
+              state: { 
+                message: 'Registration successful! Please log in to continue.'
+              } 
+            });
+          }
+        } else {
+          const successMessage = userType === 'customer' 
+            ? 'Registration successful! Please check your email to verify your account.' 
+            : 'Your account is pending approval.';
+            
+          toast.success(successMessage);
+          
+          // Redirect based on user type
+          const redirectPath = userType === 'customer' ? '/login' : `/${userType}/login`;
+          navigate(redirectPath, { 
+            state: { 
+              message: successMessage 
+            } 
+          });
+        }
+        
+      } catch (error) {
+        console.error('Registration error:', error);
+        toast.error(error.message || 'Registration failed. Please try again.');
+      } finally {
+        setLoading(false);
+        setSubmitting(false);
+      }
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      // TODO: Replace with actual API call
-      console.log('Registration data:', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password
+  // Handle role change
+  const handleRoleChange = (role) => {
+    setUserType(role);
+    formik.setFieldValue('role', role);
+    // Reset role-specific fields when changing roles
+    if (role === 'employee') {
+      formik.setValues({
+        ...formik.values,
+        employeeId: '',
+        position: '',
+        hireDate: '',
+        department: '',
+        role: 'employee'
       });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Redirect to login with success state
-      navigate('/login', { 
-        state: { 
-          fromRegister: true,
-          from: location.state?.from || { pathname: '/' }
-        } 
+    } else if (role === 'airline') {
+      formik.setValues({
+        ...formik.values,
+        airlineName: '',
+        airlineCode: '',
+        airlineType: '',
+        iataCode: '',
+        icaoCode: '',
+        role: 'airline'
       });
-    } catch (err) {
-      setError(err.message || 'Failed to create account. Please try again.');
-      setIsLoading(false);
+    } else {
+      formik.setFieldValue('role', 'customer');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 py-12 sm:px-6 lg:px-8">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl"
-      >
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="md:flex">
-            <div className="md:w-1/2 p-8">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Create your account</h1>
-                <p className="text-gray-600">Join SkyWings and start your journey with us</p>
-                
-                {error && (
-                  <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm flex items-start">
-                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-                    <span>{error}</span>
-                  </div>
-                )}
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-4xl">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+            Create your {userType} account
+          </h2>
+          
+          {/* Role Selection */}
+          <div className="mt-6">
+            <div className="flex rounded-md shadow-sm">
+              {ROLE_OPTIONS.map((role) => (
+                <button
+                  key={role.value}
+                  type="button"
+                  onClick={() => handleRoleChange(role.value)}
+                  className={`flex-1 py-2 px-4 border ${
+                    userType === role.value 
+                      ? 'bg-indigo-50 border-indigo-500 text-indigo-700' 
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                  } text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                >
+                  <span className="text-lg mr-2">{role.icon}</span>
+                  {role.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <form className="space-y-6 mt-6" onSubmit={formik.handleSubmit}>
+            {/* Basic Information */}
+            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+              <div>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  autoComplete="given-name"
+                  label="First name"
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.firstName && formik.errors.firstName}
+                  required
+                />
               </div>
               
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      First Name
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        id="firstName"
-                        name="firstName"
-                        type="text"
-                        required
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        placeholder="John"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Last Name
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        required
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        placeholder="Doe"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email address
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Phone Number
-                  </label>
-                  <div className="relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Password
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        id="password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        placeholder="••••••••"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                        tabIndex="-1"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                    
-                    {/* Password requirements */}
-                    <div className="mt-2 space-y-1.5 text-xs text-gray-500">
-                      <div className={`flex items-center ${passwordRequirements.hasMinLength ? 'text-green-600' : ''}`}>
-                        <Check className={`h-3.5 w-3.5 mr-1.5 ${passwordRequirements.hasMinLength ? 'text-green-500' : 'text-gray-300'}`} />
-                        At least 8 characters
-                      </div>
-                      <div className={`flex items-center ${passwordRequirements.hasUppercase ? 'text-green-600' : ''}`}>
-                        <Check className={`h-3.5 w-3.5 mr-1.5 ${passwordRequirements.hasUppercase ? 'text-green-500' : 'text-gray-300'}`} />
-                        At least one uppercase letter
-                      </div>
-                      <div className={`flex items-center ${passwordRequirements.hasNumber ? 'text-green-600' : ''}`}>
-                        <Check className={`h-3.5 w-3.5 mr-1.5 ${passwordRequirements.hasNumber ? 'text-green-500' : 'text-gray-300'}`} />
-                        At least one number
-                      </div>
-                      <div className={`flex items-center ${passwordRequirements.hasSpecialChar ? 'text-green-600' : ''}`}>
-                        <Check className={`h-3.5 w-3.5 mr-1.5 ${passwordRequirements.hasSpecialChar ? 'text-green-500' : 'text-gray-300'}`} />
-                        At least one special character
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Confirm Password
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        required
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        placeholder="••••••••"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                        tabIndex="-1"
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="terms"
-                      name="terms"
-                      type="checkbox"
-                      required
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="terms" className="text-gray-700">
-                      I agree to the <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className={`w-full flex justify-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 ${
-                      isLoading ? 'opacity-75 cursor-not-allowed' : ''
-                    }`}
-                  >
-                    {isLoading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Creating account...
-                      </>
-                    ) : (
-                      'Create my account'
-                    )}
-                  </button>
-                </div>
-              </form>
-
-              <div className="mt-6 text-center">
-                <p className="mt-6 text-center text-sm text-gray-600">
-                  Already have an account?{' '}
-                  <Link 
-                    to="/login" 
-                    state={{ from: location.state?.from || { pathname: '/' } }}
-                    className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                  >
-                    Sign in to your account
-                  </Link>
-                </p>
+              <div>
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  autoComplete="family-name"
+                  label="Last name"
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.lastName && formik.errors.lastName}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  label="Email address"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.email && formik.errors.email}
+                  required
+                  placeholder={
+                    userType === 'employee' 
+                      ? 'user@skywings.com' 
+                      : userType === 'airline' 
+                        ? 'user@airline.com' 
+                        : 'user@example.com'
+                  }
+                />
+              </div>
+              
+              <div>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  label="Phone number"
+                  value={formik.values.phone}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.phone && formik.errors.phone}
+                  required
+                  placeholder="1234567890"
+                />
+              </div>
+              
+              <div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  label="Password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.password && formik.errors.password}
+                  required
+                  helpText="At least 8 characters with uppercase, lowercase, number, and special character"
+                />
+              </div>
+              
+              <div>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  label="Confirm password"
+                  value={formik.values.confirmPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  label="Date of birth"
+                  value={formik.values.dateOfBirth}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.dateOfBirth && formik.errors.dateOfBirth}
+                  required
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="gender"
+                  name="gender"
+                  value={formik.values.gender}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border ${
+                    formik.touched.gender && formik.errors.gender
+                      ? 'border-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  } rounded-md`}
+                  required
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+                {formik.touched.gender && formik.errors.gender && (
+                  <p className="mt-1 text-sm text-red-600">{formik.errors.gender}</p>
+                )}
               </div>
             </div>
             
-            <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-700 p-12 text-white">
-              <div className="max-w-xs text-center text-white">
-                <h2 className="text-2xl font-bold mb-4">Welcome to SkyWings</h2>
-                <p className="mb-6 text-blue-100">Join our community of travelers and enjoy exclusive benefits and offers.</p>
-                <div className="space-y-4">
-                  {[
-                    'Best flight deals and exclusive offers',
-                    '24/7 Customer support',
-                    'Easy booking management',
-                    'Mobile boarding passes',
-                    'No booking fees',
-                    'Earn reward points on every trip'
-                  ].map((benefit, index) => (
-                    <div key={index} className="flex items-start">
-                      <div className="flex-shrink-0 h-5 w-5 bg-blue-500 rounded-full flex items-center justify-center mt-0.5">
-                        <Check className="h-3.5 w-3.5 text-white" />
-                      </div>
-                      <p className="ml-3 text-sm text-blue-100 text-left">{benefit}</p>
-                    </div>
-                  ))}
+            {/* Role-Specific Fields */}
+            {userType === 'employee' && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Employee Information</h3>
+                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                  <div>
+                    <Input
+                      id="employeeId"
+                      name="employeeId"
+                      type="text"
+                      label="Employee ID"
+                      value={formik.values.employeeId}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.employeeId && formik.errors.employeeId}
+                      required
+                      placeholder="EMP-12345"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Select
+                      id="position"
+                      name="position"
+                      label="Position"
+                      value={formik.values.position}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.position && formik.errors.position}
+                      required
+                    >
+                      <option value="">Select position</option>
+                      {EMPLOYEE_POSITIONS.map((pos) => (
+                        <option key={pos.value} value={pos.value}>
+                          {pos.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Input
+                      id="hireDate"
+                      name="hireDate"
+                      type="date"
+                      label="Hire date"
+                      value={formik.values.hireDate}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.hireDate && formik.errors.hireDate}
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Input
+                      id="department"
+                      name="department"
+                      type="text"
+                      label="Department"
+                      value={formik.values.department}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.department && formik.errors.department}
+                      placeholder="e.g., Flight Operations, Customer Service"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {userType === 'airline' && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Airline Information</h3>
+                <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <Input
+                      id="airlineName"
+                      name="airlineName"
+                      type="text"
+                      label="Airline Name"
+                      value={formik.values.airlineName}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.airlineName && formik.errors.airlineName}
+                      required
+                      placeholder="e.g., SkyWings Airlines"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Input
+                      id="airlineCode"
+                      name="airlineCode"
+                      type="text"
+                      label="Airline Code"
+                      value={formik.values.airlineCode}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.airlineCode && formik.errors.airlineCode}
+                      required
+                      placeholder="e.g., SW"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="airlineType" className="block text-sm font-medium text-gray-700 mb-1">
+                      Airline Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="airlineType"
+                      name="airlineType"
+                      value={formik.values.airlineType || ''}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border ${
+                        formik.touched.airlineType && formik.errors.airlineType
+                          ? 'border-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500'
+                          : 'border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                      } rounded-md`}
+                      required
+                    >
+                      <option value="">Select airline type</option>
+                      {AIRLINE_TYPES.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    {formik.touched.airlineType && formik.errors.airlineType && (
+                      <p className="mt-1 text-sm text-red-600">{formik.errors.airlineType}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Input
+                      id="iataCode"
+                      name="iataCode"
+                      type="text"
+                      label="IATA Code"
+                      value={formik.values.iataCode}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.iataCode && formik.errors.iataCode}
+                      required
+                      placeholder="e.g., SW"
+                      maxLength={2}
+                      className="uppercase"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Input
+                      id="icaoCode"
+                      name="icaoCode"
+                      type="text"
+                      label="ICAO Code"
+                      value={formik.values.icaoCode}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.icaoCode && formik.errors.icaoCode}
+                      required
+                      placeholder="e.g., SWG"
+                      maxLength={3}
+                      className="uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Address Section */}
+            <div className="border-t border-gray-200 pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
+              <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Input
+                    id="address"
+                    name="address"
+                    type="text"
+                    autoComplete="street-address"
+                    label="Street address"
+                    value={formik.values.address}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.address && formik.errors.address}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Input
+                    id="city"
+                    name="city"
+                    type="text"
+                    autoComplete="address-level2"
+                    label="City"
+                    value={formik.values.city}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.city && formik.errors.city}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Input
+                    id="state"
+                    name="state"
+                    type="text"
+                    autoComplete="address-level1"
+                    label="State / Province"
+                    value={formik.values.state}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.state && formik.errors.state}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Input
+                    id="country"
+                    name="country"
+                    type="text"
+                    autoComplete="country-name"
+                    label="Country"
+                    value={formik.values.country}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.country && formik.errors.country}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <Input
+                    id="postalCode"
+                    name="postalCode"
+                    type="text"
+                    autoComplete="postal-code"
+                    label="ZIP / Postal code"
+                    value={formik.values.postalCode}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.postalCode && formik.errors.postalCode}
+                    required
+                  />
                 </div>
               </div>
             </div>
-          </div>
+            
+            {/* Terms and Conditions */}
+            <div className="border-t border-gray-200 pt-6">
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="acceptTerms"
+                    name="acceptTerms"
+                    type="checkbox"
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    checked={formik.values.acceptTerms}
+                    onChange={formik.handleChange}
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="acceptTerms" className="font-medium text-gray-700">
+                    I agree to the{' '}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500">
+                      Terms of Service
+                    </a>{' '}
+                    and{' '}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-500">
+                      Privacy Policy
+                    </a>
+                  </label>
+                  <p className="text-gray-500">
+                    By creating an account, you agree to our terms and conditions.
+                  </p>
+                  {formik.touched.acceptTerms && formik.errors.acceptTerms && (
+                    <p className="mt-1 text-sm text-red-600">{formik.errors.acceptTerms}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="pt-6">
+              <Button
+                type="submit"
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white ${!formik.isValid || loading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                loading={loading}
+                disabled={!formik.isValid || loading}
+              >
+                {loading ? 'Creating Account...' : `Sign up as ${userType === 'customer' ? 'Customer' : userType === 'employee' ? 'Employee' : 'Airline Admin'}`}
+              </Button>
+              
+              <p className="mt-3 text-center text-sm text-gray-600">
+                Already have an account?{' '}
+                <Link 
+                  to={userType === 'customer' ? '/login' : `/${userType}/login`} 
+                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

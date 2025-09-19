@@ -1,415 +1,511 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Shield, Clock, DollarSign, Plane, Check, MapPin, Calendar, User, ChevronDown } from 'lucide-react';
+import { Plane, ShieldCheck, Briefcase, Globe, Star, ChevronRight } from 'lucide-react';
+
+// Simple autoplay carousel interval (ms)
+const HERO_INTERVAL = 5000;
 
 const Home = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useState({
-    from: '',
-    to: '',
-    departureDate: new Date().toISOString().split('T')[0],
-    returnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    travelers: 1,
-    class: 'economy',
-  });
   const [tripType, setTripType] = useState('roundtrip');
-  const [showTravelersDropdown, setShowTravelersDropdown] = useState(false);
-  const [showClassDropdown, setShowClassDropdown] = useState(false);
-  
-  // Popular destinations
-  const popularDestinations = [
-    { name: 'New York', code: 'NYC', image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9' },
-    { name: 'London', code: 'LHR', image: 'https://images.unsplash.com/photo-1505761671935-60ed3edb24cb' },
-    { name: 'Paris', code: 'CDG', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a' },
-    { name: 'Tokyo', code: 'HND', image: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3' },
-  ];
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [departureDate, setDepartureDate] = useState('');
+  const [returnDate, setReturnDate] = useState('');
+  const [passengers, setPassengers] = useState(1);
+  const [cabinClass, setCabinClass] = useState('economy');
+  const [validationMsg, setValidationMsg] = useState('');
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const queryParams = new URLSearchParams({
-      from: searchParams.from,
-      to: searchParams.to,
-      date: searchParams.departureDate,
-      ...(tripType === 'roundtrip' && { returnDate: searchParams.returnDate }),
-      passengers: searchParams.travelers,
-      class: searchParams.class,
-      trip: tripType,
+  const handleHomeSearch = () => {
+    if (!from || !to || !departureDate) {
+      setValidationMsg('Please fill From, To and Departure date');
+      return;
+    }
+    setValidationMsg('');
+    const params = new URLSearchParams({
+      from,
+      to,
+      date: departureDate,
     });
-    navigate(`/flights?${queryParams.toString()}`);
+    navigate(`/flights?${params.toString()}`);
   };
+
+  const swapFromTo = () => {
+    setFrom((prevFrom) => {
+      const nextFrom = to;
+      setTo(prevFrom);
+      return nextFrom;
+    });
+  };
+
+  const popularDestinations = [
+    { id: 1, name: 'New York', country: 'USA', price: '$499', image: 'https://picsum.photos/seed/nyc/800/600' },
+    { id: 2, name: 'Paris', country: 'France', price: '$599', image: 'https://picsum.photos/seed/paris/800/600' },
+    { id: 3, name: 'Tokyo', country: 'Japan', price: '$899', image: 'https://picsum.photos/seed/tokyo/800/600' },
+    { id: 4, name: 'Dubai', country: 'UAE', price: '$699', image: 'https://picsum.photos/seed/dubai/800/600' },
+    { id: 5, name: 'Sydney', country: 'Australia', price: '$1,099', image: 'https://picsum.photos/seed/sydney/800/600' },
+    { id: 6, name: 'London', country: 'UK', price: '$549', image: 'https://picsum.photos/seed/london/800/600' },
+  ];
+  
+  const heroSlides = [
+    {
+      id: 'hero1',
+      title: 'Explore the World with Skywings',
+      subtitle: 'Discover amazing destinations with our best flight deals and exceptional service.',
+      image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1920&auto=format&fit=crop', // airplane wing
+    },
+    {
+      id: 'hero2',
+      title: 'Seamless Journeys Await',
+      subtitle: 'From booking to boarding, enjoy a smooth and delightful travel experience.',
+      image: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=1920&auto=format&fit=crop', // airport terminal
+    },
+    {
+      id: 'hero3',
+      title: 'Fly Further, Pay Less',
+      subtitle: 'Exclusive offers to top destinations. Limited time deals—book now!',
+      image: 'https://images.unsplash.com/photo-1521791055366-0d553872125f?q=80&w=1920&auto=format&fit=crop', // airplane takeoff
+    },
+  ];
 
   const features = [
-    { 
-      icon: <Shield className="h-8 w-8 text-blue-600" />, 
-      title: 'Safe & Secure', 
-      description: 'Your safety is our top priority with enhanced cleaning and contactless procedures.' 
+    {
+      icon: <ShieldCheck className="h-10 w-10 text-indigo-600" />,
+      title: 'Safe Travels',
+      description: 'Your safety is our top priority with enhanced cleaning and safety measures.'
     },
-    { 
-      icon: <Clock className="h-8 w-8 text-blue-600" />, 
-      title: 'On-time Flights', 
-      description: '95% on-time performance with real-time flight status updates.' 
+    {
+      icon: <Plane className="h-10 w-10 text-indigo-600" />,
+      title: 'Global Network',
+      description: 'Fly to over 200 destinations worldwide with our extensive route network.'
     },
-    { 
-      icon: <DollarSign className="h-8 w-8 text-blue-600" />, 
-      title: 'Best Price', 
-      description: 'Price match guarantee and exclusive member deals.' 
+    {
+      icon: <Briefcase className="h-10 w-10 text-indigo-600" />,
+      title: 'Business Class',
+      description: 'Experience luxury in the sky with our premium business class service.'
     },
+    {
+      icon: <Globe className="h-10 w-10 text-indigo-600" />,
+      title: 'Eco-Friendly',
+      description: 'Committed to reducing our carbon footprint and flying more sustainably.'
+    }
   ];
 
-  const travelClasses = ['Economy', 'Premium Economy', 'Business', 'First Class'];
-  
-  const handleIncrementTravelers = () => {
-    setSearchParams(prev => ({
-      ...prev,
-      travelers: Math.min(9, prev.travelers + 1)
-    }));
+  // Hero carousel state
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isHoveringHero, setIsHoveringHero] = useState(false);
+  React.useEffect(() => {
+    if (isHoveringHero) return; // pause on hover
+    const t = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+    }, HERO_INTERVAL);
+    return () => clearInterval(t);
+  }, [isHoveringHero, heroSlides.length]);
+
+  // Destinations slider scroll refs
+  const listRef = React.useRef(null);
+  const scrollByCards = (dir = 1) => {
+    const el = listRef.current;
+    if (!el) return;
+    const card = el.querySelector('[data-card]');
+    const amount = card ? card.getBoundingClientRect().width * 2 + 32 : 600;
+    el.scrollBy({ left: dir * amount, behavior: 'smooth' });
   };
-  
-  const handleDecrementTravelers = () => {
-    setSearchParams(prev => ({
-      ...prev,
-      travelers: Math.max(1, prev.travelers - 1)
-    }));
-  };
-  
-  const selectTravelClass = (travelClass) => {
-    setSearchParams(prev => ({
-      ...prev,
-      class: travelClass.toLowerCase()
-    }));
-    setShowClassDropdown(false);
+
+  // image fallback handler
+  const handleImgError = (e, fallback = 'https://picsum.photos/seed/skywings-fallback/1200/800') => {
+    if (e.target && e.target.src !== fallback) {
+      e.target.src = fallback;
+    }
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-black opacity-40"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/50 to-blue-600/50"></div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <motion.h1 
-              className="text-4xl md:text-5xl font-extrabold mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+    <div className="min-h-screen bg-white">
+      {/* Hero Section with Search + Image Carousel */}
+      <div 
+        className="relative text-white pt-4 md:pt-6 overflow-hidden"
+        onMouseEnter={() => setIsHoveringHero(true)}
+        onMouseLeave={() => setIsHoveringHero(false)}
+      >
+        {/* Slides */}
+        <div className="absolute inset-0">
+          {heroSlides.map((slide, idx) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 transition-opacity duration-700 ${idx === activeSlide ? 'opacity-100' : 'opacity-0'}`}
+              aria-hidden={idx !== activeSlide}
             >
-              Explore the World with Ease
-            </motion.h1>
-            <motion.p 
-              className="text-xl mb-8 max-w-3xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Find the best flight deals and book your next adventure with SkyWings. Enjoy seamless travel experiences with our premium services.
-            </motion.p>
-          </div>
-        </div>
-      </div>
-
-      {/* Search Form */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
-        <motion.div 
-          className="bg-white rounded-xl shadow-2xl p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <form onSubmit={handleSearch}>
-            <div className="flex flex-wrap gap-4 mb-6">
-              {[
-                { value: 'roundtrip', label: 'Round Trip' },
-                { value: 'oneway', label: 'One Way' },
-              ].map(({ value, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setTripType(value)}
-                  className={`flex items-center px-5 py-3 rounded-lg transition-all ${
-                    tripType === value 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {tripType === value && (
-                    <Check className="h-4 w-4 mr-2" />
-                  )}
-                  {label}
-                </button>
-              ))}
+              <img src={slide.image} loading="eager" onError={(e)=>handleImgError(e)} alt={slide.title} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
-                <div className="relative">
-                  <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="City or Airport"
-                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    value={searchParams.from}
-                    onChange={(e) => setSearchParams({ ...searchParams, from: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="City or Airport"
-                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    value={searchParams.to}
-                    onChange={(e) => setSearchParams({ ...searchParams, to: e.target.value })}
-                    required
-                  />
-                </div>
+          ))}
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+          {/* Flight Search Form (placed first to be fully visible on load) */}
+          <div className="relative rounded-xl shadow-xl max-w-4xl mx-auto overflow-hidden ring-1 ring-gray-100 text-gray-900">
+            {/* Background flight image behind the form */}
+            <img
+              src="https://images.unsplash.com/photo-1521791055366-0d553872125f?q=80&w=1600&auto=format&fit=crop"
+              alt="Flight taking off"
+              loading="lazy"
+              onError={(e)=>handleImgError(e)}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/30" />
+            {/* Foreground form content */}
+            <div className="relative p-4 md:p-6 bg-white/70 backdrop-blur">
+              <div className="flex space-x-4 mb-6">
+                <button 
+                  onClick={() => setTripType('roundtrip')}
+                  className={`px-4 py-2 rounded-md font-medium ${tripType === 'roundtrip' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
+                >
+                  Roundtrip
+                </button>
+                <button 
+                  onClick={() => setTripType('oneway')}
+                  className={`px-4 py-2 rounded-md font-medium ${tripType === 'oneway' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600'}`}
+                >
+                  One Way
+                </button>
               </div>
 
-              <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Departure</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                    value={searchParams.departureDate}
-                    onChange={(e) => setSearchParams({ ...searchParams, departureDate: e.target.value })}
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </div>
-              </div>
-
-              {tripType === 'roundtrip' && (
-                <div className="md:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Return</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
-                      type="date"
-                      className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                      value={searchParams.returnDate}
-                      onChange={(e) => setSearchParams({ ...searchParams, returnDate: e.target.value })}
-                      min={searchParams.departureDate}
-                      required
+                      type="text"
+                      placeholder="City or Airport"
+                      value={from}
+                      onChange={(e) => setFrom(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
                     />
                   </div>
                 </div>
-              )}
 
-              <div className="md:col-span-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Travelers & Class</label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowTravelersDropdown(!showTravelersDropdown)}
-                    className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="City or Airport"
+                      value={to}
+                      onChange={(e) => setTo(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 placeholder-gray-400"
+                    />
+                    {/* Swap button between From/To on medium+ */}
+                    <button
+                      type="button"
+                      onClick={swapFromTo}
+                      className="hidden md:flex absolute -left-4 -top-4 md:-right-4 md:top-1/2 md:-translate-y-1/2 md:left-auto items-center justify-center h-9 w-9 rounded-full bg-white shadow ring-1 ring-gray-200 text-gray-600 hover:bg-gray-50"
+                      title="Swap From/To"
+                      aria-label="Swap From and To"
+                    >
+                      ⇄
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Departure</label>
+                  <input
+                    type="date"
+                    min={new Date().toISOString().slice(0,10)}
+                    value={departureDate}
+                    onChange={(e) => setDepartureDate(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  />
+                </div>
+
+                {tripType === 'roundtrip' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Return</label>
+                    <input
+                      type="date"
+                      min={departureDate || new Date().toISOString().slice(0,10)}
+                      value={returnDate}
+                      onChange={(e) => setReturnDate(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Passengers</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={passengers}
+                    onChange={(e) => setPassengers(parseInt(e.target.value))}
                   >
-                    <div className="flex items-center">
-                      <User className="h-5 w-5 text-gray-400 mr-2" />
-                      <span>{searchParams.travelers} {searchParams.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  </button>
-                  
-                  {showTravelersDropdown && (
-                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-medium text-gray-700">Travelers</span>
-                          <div className="flex items-center">
-                            <button
-                              type="button"
-                              onClick={handleDecrementTravelers}
-                              className="p-1 rounded-full text-gray-600 hover:bg-gray-100"
-                              disabled={searchParams.travelers <= 1}
-                            >
-                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                              </svg>
-                            </button>
-                            <span className="mx-2 w-8 text-center">{searchParams.travelers}</span>
-                            <button
-                              type="button"
-                              onClick={handleIncrementTravelers}
-                              className="p-1 rounded-full text-gray-600 hover:bg-gray-100"
-                              disabled={searchParams.travelers >= 9}
-                            >
-                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">Class</span>
-                            <div className="relative">
-                              <button
-                                type="button"
-                                onClick={() => setShowClassDropdown(!showClassDropdown)}
-                                className="flex items-center text-sm text-blue-600 hover:text-blue-800"
-                              >
-                                {searchParams.class.charAt(0).toUpperCase() + searchParams.class.slice(1)}
-                                <ChevronDown className="ml-1 h-4 w-4" />
-                              </button>
-                              
-                              {showClassDropdown && (
-                                <div className="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20">
-                                  {travelClasses.map((travelClass) => (
-                                    <button
-                                      key={travelClass}
-                                      type="button"
-                                      onClick={() => selectTravelClass(travelClass)}
-                                      className={`block w-full text-left px-4 py-2 text-sm ${
-                                        searchParams.class === travelClass.toLowerCase()
-                                          ? 'bg-blue-50 text-blue-700'
-                                          : 'text-gray-700 hover:bg-gray-50'
-                                      }`}
-                                    >
-                                      {travelClass}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="border-t border-gray-200 px-4 py-3 bg-gray-50 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => setShowTravelersDropdown(false)}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                        >
-                          Done
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                    {[1, 2, 3, 4, 5, 6].map(num => (
+                      <option key={num} value={num}>{num} {num === 1 ? 'Passenger' : 'Passengers'}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={cabinClass}
+                    onChange={(e) => setCabinClass(e.target.value)}
+                  >
+                    <option value="economy">Economy</option>
+                    <option value="premium">Premium Economy</option>
+                    <option value="business">Business</option>
+                    <option value="first">First Class</option>
+                  </select>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-6">
+              {validationMsg && (
+                <p className="mt-3 text-sm text-red-600">{validationMsg}</p>
+              )}
+
               <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 px-6 rounded-lg font-medium text-lg hover:from-blue-700 hover:to-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:scale-[1.01] shadow-lg hover:shadow-xl"
+                type="button"
+                onClick={handleHomeSearch}
+                className="mt-6 w-full bg-indigo-600 text-white py-3 px-6 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 font-medium"
               >
                 Search Flights
               </button>
             </div>
-          </form>
-        </motion.div>
-      </div>
+          </div>
 
-      {/* Features Section */}
-      <div className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Why Choose SkyWings?</h2>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-              Experience the difference with our premium services and exclusive benefits.
+          <div className="text-center mt-6">
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">
+              {heroSlides[activeSlide].title}
+            </h1>
+            <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-indigo-100">
+              {heroSlides[activeSlide].subtitle}
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
-              >
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-blue-100 text-blue-600 mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-500">{feature.description}</p>
-              </motion.div>
+
+          {/* Carousel controls */}
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {heroSlides.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => setActiveSlide(i)}
+                className={`h-2.5 w-2.5 rounded-full ${i === activeSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/80'}`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Popular Destinations */}
-      <div className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Popular Destinations</h2>
-            <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-              Discover amazing places around the world with our best deals
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {popularDestinations.map((destination, index) => (
-              <motion.div
-                key={destination.code}
-                className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
+      {/* Popular Destinations - Horizontal Slider */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900">Popular Destinations</h2>
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover our most popular destinations with exclusive flight deals
+          </p>
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={() => scrollByCards(-1)}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white shadow ring-1 ring-gray-200 hover:bg-gray-50"
+            aria-label="Scroll left"
+          >
+            ‹
+          </button>
+          <div
+            ref={listRef}
+            className="flex gap-8 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory"
+          >
+            {popularDestinations.map((destination) => (
+              <div
+                key={destination.id}
+                data-card
+                className="group relative min-w-[280px] max-w-[360px] snap-start overflow-hidden rounded-xl shadow-lg"
               >
-                <div className="aspect-w-16 aspect-h-9">
-                  <img
-                    src={`${destination.image}?w=600&h=400&fit=crop`}
-                    alt={destination.name}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">{destination.name}</h3>
-                    <p className="text-blue-200">From $199</p>
+                <img 
+                  src={destination.image} 
+                  loading="lazy"
+                  onError={(e)=>handleImgError(e, 'https://picsum.photos/seed/skywings-destination/800/600')} 
+                  alt={destination.name}
+                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent">
+                  <div className="absolute bottom-0 left-0 p-6 w-full">
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{destination.name}</h3>
+                        <p className="text-indigo-200">{destination.country}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-gray-300">FROM</span>
+                        <p className="text-2xl font-bold text-white">{destination.price}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
+                <div className="absolute top-4 right-4">
+                  <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30" title="Add to wishlist">
+                    <Star className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
-          
-          <div className="mt-12 text-center">
-            <Link
-              to="/flights"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-            >
-              View All Destinations
-              <svg className="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
+          <button
+            onClick={() => scrollByCards(1)}
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white shadow ring-1 ring-gray-200 hover:bg-gray-50"
+            aria-label="Scroll right"
+          >
+            ›
+          </button>
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link 
+            to="/flights" 
+            className="inline-flex items-center text-indigo-600 font-medium hover:text-indigo-800"
+          >
+            View all destinations
+            <ChevronRight className="ml-2 h-5 w-5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">Why Fly With Us</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Experience the difference with Skywings - where your journey matters
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center mb-4">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Call to Action */}
-      <div className="bg-blue-700">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            <span className="block">Ready to explore the world?</span>
-          </h2>
-          <p className="mt-4 text-xl text-blue-100 max-w-3xl mx-auto">
-            Join thousands of travelers who trust SkyWings for their journeys. Book your next adventure today!
-          </p>
-          <div className="mt-8 flex justify-center">
-            <Link
-              to="/register"
-              className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10 transition-colors"
-            >
-              Sign Up for Free
-            </Link>
+      {/* Special Offers */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-indigo-700 rounded-2xl p-8 md:p-12 text-white">
+          <div className="md:flex items-center justify-between">
+            <div className="md:w-1/2 mb-6 md:mb-0">
+              <h2 className="text-3xl font-bold mb-4">Special Offers</h2>
+              <p className="text-indigo-100 mb-6">
+                Sign up today and get 15% off your first booking. Plus, enjoy exclusive member-only deals and early access to sales.
+              </p>
+              <Link 
+                to="/register" 
+                className="inline-block bg-white text-indigo-700 px-6 py-3 rounded-md font-medium hover:bg-gray-100"
+              >
+                Join Now
+              </Link>
+            </div>
+            <div className="md:w-2/5">
+              <img 
+                src="https://source.unsplash.com/random/600x400?airplane" 
+                alt="Special Offer"
+                className="rounded-lg shadow-xl"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">What Our Passengers Say</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Don't just take our word for it - hear from our satisfied customers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "The best flying experience I've ever had. The crew was amazing and the service was top-notch!",
+                author: "Sarah Johnson",
+                location: "Frequent Flyer"
+              },
+              {
+                quote: "Great prices and excellent customer service. Will definitely be flying with Skywings again.",
+                author: "Michael Chen",
+                location: "Business Traveler"
+              },
+              {
+                quote: "Comfortable seats, on-time departures, and friendly staff. Highly recommended!",
+                author: "Emma Davis",
+                location: "Travel Enthusiast"
+              }
+            ].map((testimonial, index) => (
+              <div key={index} className="bg-gray-50 p-6 rounded-xl">
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 italic mb-4">"{testimonial.quote}"</p>
+                <div>
+                  <p className="font-medium text-gray-900">{testimonial.author}</p>
+                  <p className="text-sm text-gray-500">{testimonial.location}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile App CTA */}
+      <div className="bg-indigo-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+          <div className="md:flex items-center justify-between">
+            <div className="md:w-1/2 mb-8 md:mb-0">
+              <h2 className="text-3xl font-bold mb-4">Download Our Mobile App</h2>
+              <p className="text-indigo-100 mb-6 max-w-md">
+                Book flights, check-in, manage your bookings, and get real-time flight updates - all in the palm of your hand.
+              </p>
+              <div className="flex space-x-4">
+                <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center">
+                  <svg className="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.39 2.35 1.28 3.08 1.29.73 0 1.8-1.02 3.08-1.29 2.33-.5 4.04.37 5.23 1.43-4.48 2.76-3.24 8.9 1.36 10.82.9.38 1.4.3 1.92.01.25-.14.57-.4.93-.74-.97-1.13-1.6-1.67-2.6-2.7zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"></path>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs">Download on the</div>
+                    <div className="font-semibold">App Store</div>
+                  </div>
+                </button>
+                <button className="bg-black text-white px-4 py-2 rounded-lg flex items-center">
+                  <svg className="h-6 w-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm.921 18.615L11.75 13.2l-7.22-7.22v14.45zM14.75 12l7.39 7.39a1 1 0 001.61-.92V5.53a1 1 0 00-1.61-.92L14.75 12zm-3.08 0L5.53 4.92v14.16l6.14-6.15.5-.5.5.5 6.14 6.15V4.92l-6.14 6.15-.5.5z"></path>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs">Get it on</div>
+                    <div className="font-semibold">Google Play</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            <div className="md:w-2/5 flex justify-center">
+              <img 
+                src="https://source.unsplash.com/random/600x400?mobile-app" 
+                alt="Mobile App"
+                className="max-h-80"
+              />
+            </div>
           </div>
         </div>
       </div>
